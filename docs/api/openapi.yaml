@@ -1,0 +1,2882 @@
+openapi: 3.0.0
+info:
+  title: Quick-Cart API
+  description: API documentation for the Quick-Cart multivendor e-commerce app.
+  version: 1.0.0
+
+servers:
+  - url: https://db.quick-cart.com/api
+    description: Production server
+  - url: http://localhost:9000/api
+    description: Local development server
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Register a new user
+      requestBody:
+        description: User registration details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                role:
+                  type: string
+              required:
+                - name
+                - email
+                - password
+                - role
+      responses:
+        '201':
+          description: Customer account created successfully
+        '400':
+          description: User already exists
+        '500':
+          description: Failed to create customer account
+
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login a user
+      requestBody:
+        description: User login credentials
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: Successful login with user details
+        '401':
+          description: Invalid credentials
+        '500':
+          description: Failed to login
+
+  /auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: Logout a user
+      responses:
+        '200':
+          description: Logout successful
+
+  /user/get-users:
+    get:
+      tags:
+        - User
+      summary: Get all users
+      responses:
+        '200':
+          description: List of all users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '500':
+          description: Failed to retrieve users
+
+  /user/{userId}:
+    get:
+      tags:
+        - User
+      summary: Get user by ID
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: ID of the user to retrieve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: User not found
+        '500':
+          description: Failed to retrieve user
+
+  /auth/seller:
+    post:
+      tags:
+        - Auth
+      summary: Create a seller
+      requestBody:
+        description: Seller registration details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                businessName:
+                  type: string
+                phoneNumber:
+                  type: string
+                address:
+                  type: string
+                city:
+                  type: string
+                state:
+                  type: string
+              required:
+                - name
+                - email
+                - password
+                - businessName
+                - phoneNumber
+                - address
+                - city
+                - state
+      responses:
+        '201':
+          description: Seller account created successfully
+        '400':
+          description: User already exists
+        '500':
+          description: Failed to create seller account
+
+  /user/{email}:
+    put:
+      tags:
+        - User
+      summary: Update user by email
+      parameters:
+        - name: email
+          in: path
+          required: true
+          description: Email of the user to update
+          schema:
+            type: string
+      requestBody:
+        description: User update details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                password:
+                  type: string
+                businessName:
+                  type: string
+      responses:
+        '200':
+          description: User updated successfully
+        '404':
+          description: User not found
+        '500':
+          description: Failed to update user
+
+  /user/{email}/delivery-address:
+    post:
+      tags:
+        - User
+      summary: Add delivery address
+      parameters:
+        - name: email
+          in: path
+          required: true
+          description: Email of the user to add delivery address
+          schema:
+            type: string
+      requestBody:
+        description: Delivery address details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deliveryAddress:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    street:
+                      type: string
+                    landmark:
+                      type: string
+                    city:
+                      type: string
+                    state:
+                      type: string
+                    mobileNo:
+                      type: string
+                    postalCode:
+                      type: string
+              required:
+                - deliveryAddress
+      responses:
+        '200':
+          description: Delivery address added successfully
+        '404':
+          description: User not found
+        '500':
+          description: Failed to add delivery address
+
+  /user/address/{addressId}:
+    put:
+      tags:
+        - User
+      summary: Update user address
+      parameters:
+        - name: addressId
+          in: path
+          required: true
+          description: ID of the address to update
+          schema:
+            type: integer
+      requestBody:
+        description: Address update details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                street:
+                  type: string
+                landmark:
+                  type: string
+                city:
+                  type: string
+                state:
+                  type: string
+                mobileNo:
+                  type: string
+                postalCode:
+                  type: string
+              required:
+                - name
+                - street
+                - city
+                - state
+                - mobileNo
+                - postalCode
+      responses:
+        '200':
+          description: Address updated successfully
+        '404':
+          description: Address not found
+        '500':
+          description: Failed to update address
+
+  /user/delete-address/{addressId}:
+    delete:
+      tags:
+        - User
+      summary: Remove user address
+      parameters:
+        - name: addressId
+          in: path
+          required: true
+          description: ID of the address to remove
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Address removed successfully
+        '404':
+          description: Address not found
+        '500':
+          description: Failed to remove address
+
+  /user/forgot-password:
+    post:
+      tags:
+        - User
+      summary: Request password reset
+      requestBody:
+        description: User email for password reset
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+              required:
+                - email
+      responses:
+        '200':
+          description: Security code sent to email
+        '404':
+          description: User not found
+        '500':
+          description: Failed to send security code
+
+  /user/verify-otp-reset-password:
+    post:
+      tags:
+        - User
+      summary: Verify OTP and reset password
+      requestBody:
+        description: OTP and new password
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                securityCode:
+                  type: string
+                newPassword:
+                  type: string
+              required:
+                - email
+                - securityCode
+                - newPassword
+      responses:
+        '200':
+          description: Password reset successfully
+        '400':
+          description: Invalid or expired security code
+        '500':
+          description: Failed to reset password
+
+  /user/resend-security-code:
+    post:
+      tags:
+        - User
+      summary: Resend security code
+      requestBody:
+        description: User email to resend security code
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+              required:
+                - email
+      responses:
+        '200':
+          description: Security code resent
+        '404':
+          description: User not found
+        '500':
+          description: Failed to resend security code
+  /products:
+    post:
+      summary: Create a new product
+      tags:
+        - Products
+      requestBody:
+        description: Product details to create a new product.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                  format: float
+                discount_price:
+                  type: number
+                  format: float
+                category:
+                  type: string
+                subcategory:
+                  type: string
+                brand:
+                  type: string
+                variations:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      options:
+                        type: array
+                        items:
+                          type: string
+                seller:
+                  type: string
+                featured:
+                  type: boolean
+                condition:
+                  type: string
+                stock:
+                  type: integer
+              required:
+                - name
+                - description
+                - price
+                - seller
+      responses:
+        '201':
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  price:
+                    type: number
+                    format: float
+                  discount_price:
+                    type: number
+                    format: float
+                  category:
+                    type: string
+                  subcategory:
+                    type: string
+                  brand:
+                    type: string
+                  variations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        options:
+                          type: array
+                          items:
+                            type: string
+                  seller:
+                    type: string
+                  featured:
+                    type: boolean
+                  condition:
+                    type: string
+                  stock:
+                    type: integer
+                  images:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+    get:
+      summary: Retrieve a list of products
+      tags:
+        - Products
+      parameters:
+        - name: searchText
+          in: query
+          description: Optional text to search in product name and description. If provided, filters products to match the search text.
+          required: false
+          schema:
+            type: string
+        - name: category
+          in: query
+          description: Optional filter to get products by category.
+          required: false
+          schema:
+            type: string
+        - name: brand
+          in: query
+          description: Optional filter to get products by brand.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of products matching the criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    price:
+                      type: number
+                      format: float
+                    discount_price:
+                      type: number
+                      format: float
+                    category:
+                      type: string
+                    subcategory:
+                      type: string
+                    brand:
+                      type: string
+                    variations:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          options:
+                            type: array
+                            items:
+                              type: string
+                    seller:
+                      type: string
+                    featured:
+                      type: boolean
+                    condition:
+                      type: string
+                    stock:
+                      type: integer
+                    images:
+                      type: array
+                      items:
+                        type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /products/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: ID of the product
+        required: true
+        schema:
+          type: string
+
+    put:
+      summary: Update a product by ID
+      tags:
+        - Products
+      requestBody:
+        description: Product details to update.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                  format: float
+                discount_price:
+                  type: number
+                  format: float
+                category:
+                  type: string
+                subcategory:
+                  type: string
+                brand:
+                  type: string
+                variations:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      options:
+                        type: array
+                        items:
+                          type: string
+                seller:
+                  type: string
+                featured:
+                  type: boolean
+                condition:
+                  type: string
+                stock:
+                  type: integer
+              required:
+                - name
+                - description
+                - price
+                - seller
+      responses:
+        '200':
+          description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  price:
+                    type: number
+                    format: float
+                  discount_price:
+                    type: number
+                    format: float
+                  category:
+                    type: string
+                  subcategory:
+                    type: string
+                  brand:
+                    type: string
+                  variations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        options:
+                          type: array
+                          items:
+                            type: string
+                  seller:
+                    type: string
+                  featured:
+                    type: boolean
+                  condition:
+                    type: string
+                  stock:
+                    type: integer
+                  images:
+                    type: array
+                    items:
+                      type: string
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+    delete:
+      summary: Delete a product by ID
+      tags:
+        - Products
+      responses:
+        '200':
+          description: Product deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+
+  /stores:
+    get:
+      summary: Get all stores
+      tags:
+        - Stores
+      responses:
+        '200':
+          description: List of all stores
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                        businessName:
+                          type: string
+                        description:
+                          type: string
+                        location:
+                          type: string
+                        owner:
+                          type: string
+                        products:
+                          type: array
+                          items:
+                            type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /stores/{businessName}:
+    get:
+      summary: Fetch store by name
+      tags:
+        - Stores
+      parameters:
+        - name: businessName
+          in: path
+          description: Business name of the store to fetch
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Store details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  businessName:
+                    type: string
+                  description:
+                    type: string
+                  location:
+                    type: string
+                  owner:
+                    type: string
+                  products:
+                    type: array
+                    items:
+                      type: string
+        '404':
+          description: Store not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /stores/{id}:
+    get:
+      summary: Fetch store by ID
+      tags:
+        - Stores
+      parameters:
+        - name: id
+          in: path
+          description: ID of the store to fetch
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Store details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  businessName:
+                    type: string
+                  description:
+                    type: string
+                  location:
+                    type: string
+                  owner:
+                    type: string
+                  products:
+                    type: array
+                    items:
+                      type: string
+        '404':
+          description: Store not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+    put:
+      summary: Update store information
+      tags:
+        - Stores
+      requestBody:
+        description: Store information to update.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                businessName:
+                  type: string
+                description:
+                  type: string
+                location:
+                  type: string
+                owner:
+                  type: string
+                products:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Store updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  businessName:
+                    type: string
+                  description:
+                    type: string
+                  location:
+                    type: string
+                  owner:
+                    type: string
+                  products:
+                    type: array
+                    items:
+                      type: string
+        '404':
+          description: Store not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+    delete:
+      summary: Delete a store
+      tags:
+        - Stores
+      responses:
+        '200':
+          description: Store deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Store not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /stores/{storeId}/info:
+    get:
+      summary: Display a store page with products
+      tags:
+        - Stores
+      parameters:
+        - name: storeId
+          in: path
+          description: ID of the store to display
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Store and associated products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  store:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      businessName:
+                        type: string
+                      description:
+                        type: string
+                      location:
+                        type: string
+                      owner:
+                        type: string
+                      products:
+                        type: array
+                        items:
+                          type: string
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                        name:
+                          type: string
+                        description:
+                          type: string
+                        price:
+                          type: number
+                          format: float
+                        discount_price:
+                          type: number
+                          format: float
+                        category:
+                          type: string
+                        subcategory:
+                          type: string
+                        brand:
+                          type: string
+                        variations:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              options:
+                                type: array
+                                items:
+                                  type: string
+                        seller:
+                          type: string
+                        featured:
+                          type: boolean
+                        condition:
+                          type: string
+                        stock:
+                          type: integer
+                        images:
+                          type: array
+                          items:
+                            type: string
+        '404':
+          description: Store not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /orders:
+    post:
+      summary: Place a new order
+      tags:
+        - Orders
+      requestBody:
+        description: Order details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                products:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      product:
+                        type: string
+                      quantity:
+                        type: integer
+                user:
+                  type: string
+              required:
+                - products
+                - user
+      responses:
+        '201':
+          description: Order placed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        product:
+                          type: string
+                        quantity:
+                          type: integer
+                  user:
+                    type: string
+                  status:
+                    type: string
+                  createdAt:
+                    type: string
+                    format: date-time
+                  updatedAt:
+                    type: string
+                    format: date-time
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /orders/virtual:
+    post:
+      summary: Place a virtual order
+      tags:
+        - Orders
+      requestBody:
+        description: Virtual order details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                products:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      product:
+                        type: string
+                      quantity:
+                        type: integer
+                user:
+                  type: string
+              required:
+                - products
+                - user
+      responses:
+        '201':
+          description: Virtual order placed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        product:
+                          type: string
+                        quantity:
+                          type: integer
+                  user:
+                    type: string
+                  status:
+                    type: string
+                  type:
+                    type: string
+                  createdAt:
+                    type: string
+                    format: date-time
+                  updatedAt:
+                    type: string
+                    format: date-time
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /orders/{orderId}:
+    put:
+      summary: Update an order
+      tags:
+        - Orders
+      parameters:
+        - name: orderId
+          in: path
+          description: ID of the order to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Order status to update
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+              required:
+                - status
+      responses:
+        '200':
+          description: Order updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        product:
+                          type: string
+                        quantity:
+                          type: integer
+                  user:
+                    type: string
+                  status:
+                    type: string
+                  createdAt:
+                    type: string
+                    format: date-time
+                  updatedAt:
+                    type: string
+                    format: date-time
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+    delete:
+      summary: Cancel an order
+      tags:
+        - Orders
+      parameters:
+        - name: orderId
+          in: path
+          description: ID of the order to cancel
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order canceled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '400':
+          description: Order cannot be canceled at this stage
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /orders/all:
+    get:
+      summary: Get all orders
+      tags:
+        - Orders
+      responses:
+        '200':
+          description: List of all orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    products:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          product:
+                            type: string
+                          quantity:
+                            type: integer
+                    user:
+                      type: string
+                    status:
+                      type: string
+                    createdAt:
+                      type: string
+                      format: date-time
+                    updatedAt:
+                      type: string
+                      format: date-time
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /orders/user:
+    get:
+      summary: Fetch orders for a particular user
+      tags:
+        - Orders
+      responses:
+        '200':
+          description: List of orders for the logged-in user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    products:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          product:
+                            type: string
+                          quantity:
+                            type: integer
+                    user:
+                      type: string
+                    status:
+                      type: string
+                    createdAt:
+                      type: string
+                      format: date-time
+                    updatedAt:
+                      type: string
+                      format: date-time
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /orders/store/{storeId}:
+    get:
+      summary: Fetch orders for a particular store
+      tags:
+        - Orders
+      parameters:
+        - name: storeId
+          in: path
+          description: ID of the store to fetch orders for
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of orders for the specified store
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    products:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          product:
+                            type: string
+                          quantity:
+                            type: integer
+                          store:
+                            type: string
+                    user:
+                      type: string
+                    status:
+                      type: string
+                    createdAt:
+                      type: string
+                      format: date-time
+                    updatedAt:
+                      type: string
+                      format: date-time
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /cart/{userId}:
+    get:
+      summary: Get all cart items for a user
+      tags:
+        - Cart Items
+      parameters:
+        - name: userId
+          in: path
+          description: ID of the user to get cart items for
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of cart items for the user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    user:
+                      type: string
+                    product:
+                      type: string
+                    salePrice:
+                      type: number
+                    createdAt:
+                      type: string
+                      format: date-time
+                    updatedAt:
+                      type: string
+                      format: date-time
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /cart:
+    post:
+      summary: Create a new cart item
+      tags:
+        - Cart Items
+      requestBody:
+        description: Cart item details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: string
+                product:
+                  type: string
+                salePrice:
+                  type: number
+              required:
+                - user
+                - product
+                - salePrice
+      responses:
+        '201':
+          description: Cart item created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  user:
+                    type: string
+                  product:
+                    type: string
+                  salePrice:
+                    type: number
+                  createdAt:
+                    type: string
+                    format: date-time
+                  updatedAt:
+                    type: string
+                    format: date-time
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /cart/{id}:
+    delete:
+      summary: Delete a cart item by ID
+      tags:
+        - Cart Items
+      parameters:
+        - name: id
+          in: path
+          description: ID of the cart item to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Cart item deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /cart/delete:
+    post:
+      summary: Delete multiple cart items
+      tags:
+        - Cart Items
+      requestBody:
+        description: Array of cart item IDs to delete
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                itemIds:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - itemIds
+      responses:
+        '200':
+          description: Cart items deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /categories:
+    get:
+      summary: Get all categories
+      tags:
+        - Categories
+      responses:
+        '200':
+          description: List of all categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    title:
+                      type: string
+                    subTitle:
+                      type: string
+                    imageUrl:
+                      type: string
+                    subCategories:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          _id:
+                            type: string
+                          title:
+                            type: string
+                          imageUrl:
+                            type: string
+                          category:
+                            type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /categories/create:
+    post:
+      summary: Create a new category
+      tags:
+        - Categories
+      requestBody:
+        description: Category details
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                subTitle:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+              required:
+                - title
+                - file
+      responses:
+        '201':
+          description: Category created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  title:
+                    type: string
+                  subTitle:
+                    type: string
+                  imageUrl:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /categories/{id}:
+    delete:
+      summary: Delete a category by ID
+      tags:
+        - Categories
+      parameters:
+        - name: id
+          in: path
+          description: ID of the category to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Category deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /subcategories:
+    get:
+      summary: Get all subcategories
+      tags:
+        - Subcategories
+      responses:
+        '200':
+          description: List of all subcategories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    title:
+                      type: string
+                    imageUrl:
+                      type: string
+                    category:
+                      type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /subcategories/create:
+    post:
+      summary: Create a new subcategory
+      tags:
+        - Subcategories
+      requestBody:
+        description: Subcategory details
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                category:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+              required:
+                - title
+                - category
+      responses:
+        '201':
+          description: Subcategory created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  title:
+                    type: string
+                  imageUrl:
+                    type: string
+                  category:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /subcategories/{id}:
+    delete:
+      summary: Delete a subcategory by ID
+      tags:
+        - Subcategories
+      parameters:
+        - name: id
+          in: path
+          description: ID of the subcategory to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Subcategory deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /wallets:
+    post:
+      summary: Create a wallet for a user
+      tags:
+        - Wallet
+      requestBody:
+        description: User ID to create the wallet for
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+              required:
+                - userId
+      responses:
+        '201':
+          description: Wallet created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  user:
+                    type: string
+                  balance:
+                    type: number
+                  transactions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                        amount:
+                          type: number
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /wallets/{userId}/balance:
+    get:
+      summary: Get wallet balance for a user
+      tags:
+        - Wallet
+      parameters:
+        - name: userId
+          in: path
+          description: ID of the user to get wallet balance for
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Wallet balance for the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  balance:
+                    type: number
+        '404':
+          description: Wallet not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /wallets/{userId}/update-balance:
+    patch:
+      summary: Update wallet balance for a user
+      tags:
+        - Wallet
+      parameters:
+        - name: userId
+          in: path
+          description: ID of the user to update wallet balance for
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Amount to update the wallet balance by
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+              required:
+                - amount
+      responses:
+        '200':
+          description: Wallet balance updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  user:
+                    type: string
+                  balance:
+                    type: number
+                  transactions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                        amount:
+                          type: number
+        '404':
+          description: Wallet not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /wallets/{userId}/transactions:
+    get:
+      summary: Get transaction history for a user
+      tags:
+        - Wallet
+      parameters:
+        - name: userId
+          in: path
+          description: ID of the user to get transaction history for
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transaction history for the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                        amount:
+                          type: number
+        '404':
+          description: Wallet not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /banners:
+    post:
+      summary: Upload a new banner
+      tags:
+        - Banners
+      requestBody:
+        description: Banner details
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                linkedProducts:
+                  type: array
+                  items:
+                    type: string
+                file:
+                  type: string
+                  format: binary
+              required:
+                - name
+                - file
+      responses:
+        '201':
+          description: Banner uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  name:
+                    type: string
+                  imageUrl:
+                    type: string
+                  linkedProducts:
+                    type: array
+                    items:
+                      type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /banners/get-all:
+    get:
+      summary: Get all banners
+      tags:
+        - Banners
+      responses:
+        '200':
+          description: List of all banners
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    name:
+                      type: string
+                    imageUrl:
+                      type: string
+                    linkedProducts:
+                      type: array
+                      items:
+                        type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /banners/{id}:
+    get:
+      summary: Get a banner by ID
+      tags:
+        - Banners
+      parameters:
+        - name: id
+          in: path
+          description: ID of the banner to retrieve
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Banner details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  name:
+                    type: string
+                  imageUrl:
+                    type: string
+                  linkedProducts:
+                    type: array
+                    items:
+                      type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /banners/update-banner{id}:
+    patch:
+      summary: Update banner details
+      tags:
+        - Banners
+      parameters:
+        - name: id
+          in: path
+          description: ID of the banner to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Updated banner details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                linkedProducts:
+                  type: array
+                  items:
+                    type: string
+                imageUrl:
+                  type: string
+      responses:
+        '200':
+          description: Banner updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  name:
+                    type: string
+                  imageUrl:
+                    type: string
+                  linkedProducts:
+                    type: array
+                    items:
+                      type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /banners/delete-banner/{id}:
+    delete:
+      summary: Delete a banner by ID
+      tags:
+        - Banners
+      parameters:
+        - name: id
+          in: path
+          description: ID of the banner to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Banner deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /messages:
+    post:
+      summary: Create a new message or update an existing thread
+      tags:
+        - Messages
+      requestBody:
+        description: Message details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sender:
+                  type: string
+                receiver:
+                  type: string
+                lastChat:
+                  type: string
+                image:
+                  type: string
+              required:
+                - sender
+                - receiver
+                - lastChat
+      responses:
+        '201':
+          description: Message created or thread updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  picture:
+                    type: string
+                  latest_timestamp:
+                    type: string
+                    format: date-time
+                  lastChat:
+                    type: string
+                  seen:
+                    type: boolean
+                  productImg:
+                    type: string
+                  receiver:
+                    type: string
+                  sender:
+                    type: string
+        '400':
+          description: Invalid message data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /messages/{messageId}/seen:
+    patch:
+      summary: Update the 'seen' status of a message
+      tags:
+        - Messages
+      parameters:
+        - name: messageId
+          in: path
+          description: ID of the message to update
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Message 'seen' status updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '404':
+          description: Message not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /messages/get-all:
+    get:
+      summary: Get all messages
+      tags:
+        - Messages
+      responses:
+        '200':
+          description: List of all messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    sender:
+                      type: string
+                    receiver:
+                      type: string
+                    messages:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          sender:
+                            type: string
+                          lastChat:
+                            type: string
+                          image:
+                            type: string
+                    latest_timestamp:
+                      type: string
+                      format: date-time
+                    seen:
+                      type: boolean
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /messages/user/{userId}:
+    get:
+      summary: Get all messages for a user
+      tags:
+        - Messages
+      parameters:
+        - name: userId
+          in: path
+          description: ID of the user
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of all messages for the user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    sender:
+                      type: string
+                    receiver:
+                      type: string
+                    messages:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          sender:
+                            type: string
+                          lastChat:
+                            type: string
+                          image:
+                            type: string
+                    latest_timestamp:
+                      type: string
+                      format: date-time
+                    seen:
+                      type: boolean
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /messages/{sender}/{receiver}:
+    get:
+      summary: Get messages between two users
+      tags:
+        - Messages
+      parameters:
+        - name: sender
+          in: path
+          description: ID of the sender
+          required: true
+          schema:
+            type: string
+        - name: receiver
+          in: path
+          description: ID of the receiver
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of messages between the sender and receiver
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    sender:
+                      type: string
+                    receiver:
+                      type: string
+                    messages:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          sender:
+                            type: string
+                          lastChat:
+                            type: string
+                          image:
+                            type: string
+                    latest_timestamp:
+                      type: string
+                      format: date-time
+                    seen:
+                      type: boolean
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /pickup-stations:
+    post:
+      summary: Create a new pickup station
+      tags:
+        - Pickup Stations
+      requestBody:
+        description: Pickup station details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                address:
+                  type: object
+                  properties:
+                    state:
+                      type: string
+                    city:
+                      type: string
+                    street:
+                      type: string
+                contact:
+                  type: string
+              required:
+                - name
+                - address
+      responses:
+        '201':
+          description: Pickup station created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  name:
+                    type: string
+                  address:
+                    type: object
+                    properties:
+                      state:
+                        type: string
+                      city:
+                        type: string
+                      street:
+                        type: string
+                  contact:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /pickup-stations/{id}:
+    patch:
+      summary: Update a pickup station
+      tags:
+        - Pickup Stations
+      parameters:
+        - name: id
+          in: path
+          description: ID of the pickup station to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Updated pickup station details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                address:
+                  type: object
+                  properties:
+                    state:
+                      type: string
+                    city:
+                      type: string
+                    street:
+                      type: string
+                contact:
+                  type: string
+      responses:
+        '200':
+          description: Pickup station updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  name:
+                    type: string
+                  address:
+                    type: object
+                    properties:
+                      state:
+                        type: string
+                      city:
+                        type: string
+                      street:
+                        type: string
+                  contact:
+                    type: string
+        '404':
+          description: Pickup station not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /pickup-stations/delete-station/{id}:
+    delete:
+      summary: Delete a pickup station
+      tags:
+        - Pickup Stations
+      parameters:
+        - name: id
+          in: path
+          description: ID of the pickup station to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Pickup station deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Pickup station not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /pickup-stations/get-all:
+    get:
+      summary: Get all pickup stations
+      tags:
+        - Pickup Stations
+      parameters:
+        - name: state
+          in: query
+          description: Filter by state
+          schema:
+            type: string
+        - name: city
+          in: query
+          description: Filter by city
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of pickup stations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    name:
+                      type: string
+                    address:
+                      type: object
+                      properties:
+                        state:
+                          type: string
+                        city:
+                          type: string
+                        street:
+                          type: string
+                    contact:
+                      type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /pickup-stations/get-one/{id}:
+    get:
+      summary: Get a pickup station by ID
+      tags:
+        - Pickup Stations
+      parameters:
+        - name: id
+          in: path
+          description: ID of the pickup station
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Pickup station details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  name:
+                    type: string
+                  address:
+                    type: object
+                    properties:
+                      state:
+                        type: string
+                      city:
+                        type: string
+                      street:
+                        type: string
+                  contact:
+                    type: string
+        '404':
+          description: Pickup station not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
