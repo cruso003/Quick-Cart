@@ -44,7 +44,7 @@ To get started with Quick-Cart, follow the installation instructions for each co
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/cruso003/Quick-Cart
    cd customer-app
    ```
 
@@ -62,7 +62,7 @@ To get started with Quick-Cart, follow the installation instructions for each co
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/cruso003/Quick-Cart
    cd vendor-panel
    ```
 
@@ -80,7 +80,7 @@ To get started with Quick-Cart, follow the installation instructions for each co
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/cruso003/Quick-Cart
    cd admin-panel
    ```
 
@@ -98,7 +98,7 @@ To get started with Quick-Cart, follow the installation instructions for each co
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/cruso003/Quick-Cart
    cd backend
    ```
 
@@ -128,7 +128,7 @@ To get started with Quick-Cart, follow the installation instructions for each co
 
 ## API Documentation
 
-For detailed API documentation, including endpoints, request parameters, and response formats, refer to the [OpenAPI Documentation](./api/openapi.yaml).
+For detailed API documentation, including endpoints, request parameters, and response formats, refer to the [OpenAPI Documentation](./docs/api/openapi.yaml).
 
 ## Contributing
 
@@ -140,8 +140,8 @@ We welcome contributions to the Quick-Cart project! Please follow these guidelin
 4. Push your branch.
 5. Create a pull request.
 
-For detailed contribution guidelines, please refer to the [CONTRIBUTING.md](./CONTRIBUTING.md).
+For detailed contribution guidelines, please refer to the [CONTRIBUTING.md](./docs/CONTRIBUTING.md).
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](./docs/LICENSE) file for details.

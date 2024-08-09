@@ -12,3 +12,47 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id                  String    @id @default(auto()) @map("_id") @db.ObjectId
+  name                String
+  email               String    @unique
+  avatar              String?
+  password            String
+  phoneNumber         String?
+  address             String?
+  deliveryAddresses   Address[]
+  role                String    @default("CUSTOMER")
+  businessName        String?
+  storeId             String?   @db.ObjectId
+  createdAt           DateTime  @default(now())
+  resetPasswordToken  String?
+  resetPasswordTime   DateTime?
+  securityCode        String?
+  securityCodeExpires DateTime?
+
+  Store Store? @relation(fields: [storeId], references: [id])
+}
+
+model Address {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  mobileNo   String
+  street     String
+  city       String?
+  state      String
+  landmark   String
+  postalCode String?
+  default    Boolean @default(false)
+  userId     String  @db.ObjectId
+  User       User    @relation(fields: [userId], references: [id])
+}
+
+model Store {
+  id      String  @id @default(auto()) @map("_id") @db.ObjectId
+  name    String
+  phoneNumber String
+  address String
+  users   User[]
+}
+
