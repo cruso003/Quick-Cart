@@ -17,7 +17,7 @@ export const getStoresByName = async (req, res) => {
   try {
     const businessName = req.params.businessName;
 
-    const store = await prisma.store.findUnique({
+    const store = await prisma.store.findMany({
       where: { businessName },
     });
 
@@ -35,7 +35,11 @@ export const getStoresByName = async (req, res) => {
 // Fetch store by ID
 export const getStoresById = async (req, res) => {
   try {
-    const storeId = req.params.id;
+    const storeId = req.params.storeId;
+
+    if (!storeId) {
+      return res.status(400).json({ error: "Store ID is required" });
+    }
 
     const store = await prisma.store.findUnique({
       where: { id: storeId },
@@ -52,28 +56,33 @@ export const getStoresById = async (req, res) => {
   }
 };
 
+
 // Route to display a store page
 export const getStoresInfo = async (req, res) => {
   try {
     const storeId = req.params.storeId;
 
-    // Fetch the store with related products
     const store = await prisma.store.findUnique({
       where: { id: storeId },
-      include: { products: true }, // Fetch related products
+      include: { products: true },
     });
 
     if (!store) {
       return res.status(404).json({ error: "Store not found" });
     }
 
-    // Render or send the store and products to the client as needed
+    // Check if the products array is empty
+    if (store.products.length === 0) {
+      console.log("No products found for this store.");
+    }
+
     res.render("store", { store, products: store.products });
   } catch (error) {
     console.error("Error fetching store and products:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 // Route to update store information
 export const updateStore = async (req, res) => {
