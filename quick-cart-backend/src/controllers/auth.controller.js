@@ -84,12 +84,14 @@ export const logoutUser = (req, res) => {
 // Create a seller
 export const createSeller = async (req, res) => {
   const {
-    name,
+    name, // Store owner's name
     email,
     password,
     businessName,
     phoneNumber,
     address,
+    city, // Add the city field
+    state, // Add the state field as it's also in your Store model
   } = req.body;
 
   try {
@@ -102,6 +104,7 @@ export const createSeller = async (req, res) => {
         .status(400)
         .json({ success: false, message: "User already exists" });
 
+    // Create the seller (user)
     const seller = await prisma.user.create({
       data: {
         name,
@@ -114,11 +117,17 @@ export const createSeller = async (req, res) => {
       },
     });
 
+    // Create the store with the correct owner name and reference, including the email field
     const store = await prisma.store.create({
       data: {
-        name: businessName,
+        name, // Store owner's name
+        businessName,
         phoneNumber,
-        address
+        address,
+        email,
+        city,  // Include the city field
+        state, // Include the state field
+        ownerId: seller.id,
       },
     });
 
@@ -133,4 +142,3 @@ export const createSeller = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
