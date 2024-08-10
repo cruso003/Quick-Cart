@@ -6,6 +6,7 @@ import swaggerRoute from './src/routes/swagger.route.js';
 import userRoute from "./src/routes/user.route.js";
 import authRoute from "./src/routes/auth.route.js";
 import productRoute from "./src/routes/product.route.js";
+import storeRoute from "./src/routes/store.route.js";
 
 // Initialize Express
 const app = express();
@@ -17,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 // Setup multer for handling multipart/form-data
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/'); // Set your upload destination here
+    cb(null, 'uploads/');
   },
   filename: function (req, file, cb) {
     cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
@@ -31,6 +32,7 @@ app.use('/', swaggerRoute);
 // General Routes
 app.use('/api/user', userRoute);
 app.use('/api/auth', authRoute);
+app.use('/api/stores', storeRoute);
 
 // Use `upload.array()` for multiple images
 app.use('/api/products', upload.array('file', 10), productRoute);

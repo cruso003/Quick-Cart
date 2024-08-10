@@ -25,7 +25,7 @@ model User {
   securityCode        String?
   securityCodeExpires DateTime?
 
-  Store Store? @relation(fields: [storeId], references: [id])
+  store   Store?  @relation("UserStore")
 }
 
 model Address {
@@ -39,16 +39,22 @@ model Address {
   postalCode String?
   default    Boolean @default(false)
   userId     String  @db.ObjectId
-  User       User    @relation(fields: [userId], references: [id])
+  user       User    @relation(fields: [userId], references: [id])
 }
 
 model Store {
-  id      String  @id @default(auto()) @map("_id") @db.ObjectId
-  name    String
-  phoneNumber String
-  address String
-  products Product[]
-  users   User[]
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  businessName String
+  phoneNumber  String
+  email        String
+  address      String
+  city         String
+  state        String
+  ownerId      String   @db.ObjectId @unique
+  products     Product[]
+
+  owner        User     @relation("UserStore", fields: [ownerId], references: [id])
 }
 
 model Product {
@@ -65,7 +71,7 @@ model Product {
   variations    Variation[]
   ratings       Rating[]
   featured      Boolean
-  totalSale    Int?         @map("total_sale")
+  totalSale     Int?        @map("total_sale")
   stock         Int
   brand         String?
   lastUpdated   DateTime    @default(now())
@@ -76,32 +82,32 @@ model Product {
 }
 
 model Variation {
-  id      String   @id @default(auto()) @map("_id") @db.ObjectId
-  name    String
-  options String[]
-  productId String @db.ObjectId
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  options     String[]
+  productId   String @db.ObjectId
 
-  product Product @relation(fields: [productId], references: [id])
+  product     Product @relation(fields: [productId], references: [id])
 }
 
 model Rating {
-  id       String  @id @default(auto()) @map("_id") @db.ObjectId
-  user     String
-  rating   Float
-  comment  String
-  productId String @db.ObjectId
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  user        String
+  rating      Float
+  comment     String
+  productId   String @db.ObjectId
 
-  product Product @relation(fields: [productId], references: [id])
+  product     Product @relation(fields: [productId], references: [id])
 }
 
 model Category {
-  id    String    @id @default(auto()) @map("_id") @db.ObjectId
-  name  String
-  products Product[]
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  products    Product[]
 }
 
 model Subcategory {
-  id    String    @id @default(auto()) @map("_id") @db.ObjectId
-  name  String
-  products Product[]
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  products    Product[]
 }
