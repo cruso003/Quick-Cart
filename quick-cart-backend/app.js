@@ -8,6 +8,7 @@ import authRoute from "./src/routes/auth.route.js";
 import productRoute from "./src/routes/product.route.js";
 import storeRoute from "./src/routes/store.route.js";
 import categoryRoute from "./src/routes/category.route.js";
+import subcategoryRoute from "./src/routes/subcategory.route.js";
 
 // Initialize Express
 const app = express();
@@ -34,7 +35,8 @@ app.use('/', swaggerRoute);
 app.use('/api/user', userRoute);
 app.use('/api/auth', authRoute);
 app.use('/api/stores', storeRoute);
-app.use('/api/categories',upload.single("image"),categoryRoute)
+app.use('/api/categories',upload.single("image"),categoryRoute);
+app.use('/api/subcategories',upload.single("image"),subcategoryRoute);
 // Use `upload.array()` for multiple images
 app.use('/api/products', upload.array('file', 10), productRoute);
 
