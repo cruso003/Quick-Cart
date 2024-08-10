@@ -1,4 +1,4 @@
-import cloudinary from 'cloudinary';
+import { v2 as cloudinary } from 'cloudinary'
 import prisma from '../../lib/prisma.js';
 
 // Configure Cloudinary
