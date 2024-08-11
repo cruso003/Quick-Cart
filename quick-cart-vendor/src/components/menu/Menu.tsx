@@ -1,8 +1,14 @@
 import { Link } from "react-router-dom";
 import "./menu.scss";
-import { menu } from "../../../data"
+import { menu } from "../../../data";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Menu = () => {
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <div className="menu">
@@ -19,7 +25,7 @@ const Menu = () => {
       ))}
       <div className="item">
         <span className="title">system settings</span>
-        <div className="listItem"  style={{ cursor: "pointer" }}>
+        <div className="listItem" onClick={handleLogout} style={{ cursor: "pointer" }}>
           <img src="/logout.svg" alt="" /> 
           <span className="listItemTitle">Logout</span>
         </div>
