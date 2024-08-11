@@ -29,37 +29,37 @@ export const getSubcategories = async (req, res) => {
 
 //Create a new subcategory
 export const createSubcategory = async (req, res) => {
-    try {
-      const { title, categoryId } = req.body;
-      let imageUrl = "";
-  
-      // Check if there's a file in the request
-      if (req.file) {
-        // Upload the image to Cloudinary
-        const result = await cloudinary.uploader.upload(req.file.path);
-  
-        // Get the secure URL of the uploaded image
-        imageUrl = result.secure_url;
-      }
-  
-      // Create a new subcategory
-      const newSubcategory = await prisma.subcategory.create({
-        data: {
-          title,
-          imageUrl,
-          category: {
-            connect: { id: categoryId },
-          },
-        },
-      });
-  
-      // Send the created subcategory as a response
-      res.status(201).json(newSubcategory);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal Server Error" });
+  try {
+    const { title, categoryId } = req.body;
+    let imageUrl = "";
+
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path);
+      imageUrl = result.secure_url;
     }
-  };
+
+    // Ensure categoryId is defined and not empty
+    if (!categoryId) {
+      return res.status(400).json({ error: "Category ID is required" });
+    }
+
+    const newSubcategory = await prisma.subcategory.create({
+      data: {
+        title,
+        imageUrl,
+        category: {
+          connect: { id: categoryId },
+        },
+      },
+    });
+
+    res.status(201).json(newSubcategory);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 
   //Delete a subcategory
   export const deleteSubcategory = async (req, res) => {

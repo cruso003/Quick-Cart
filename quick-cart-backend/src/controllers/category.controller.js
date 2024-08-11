@@ -36,7 +36,7 @@ export const createCategory = async (req, res) => {
   
       // Upload image to Cloudinary
       const cloudinaryUpload = await cloudinary.uploader.upload(file.path, {
-        folder: "category_images", // Optional: set a folder in Cloudinary
+        folder: "category_images",
       });
   
       // Create a new category with Cloudinary image URL
@@ -50,7 +50,7 @@ export const createCategory = async (req, res) => {
   
       res.status(201).json(newCategory);
     } catch (error) {
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(500).json({ error: error.message });
     }
   };
   
