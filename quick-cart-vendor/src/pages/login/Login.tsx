@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
 import './login.scss';
 import { authApiRequests } from '../../api/api';
@@ -15,36 +16,45 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
+  
     try {
       // Use the loginVendor function from apiRequests
       const response = await authApiRequests.loginVendor(email, password);
       
-      
       const user = response.data;
-
-      if (user.role !== 'seller') {
-        toast.error("Not authorized");
+  
+      // Check if the account is approved
+      if (!user.isApproved) {
+        toast.error("Account Pending Verification. Wait for Verification Email.");
+         // Stop loading if the account is not approved
+        setLoading(false);
+        // Cancel login
         return;
       }
-
+  
+      if (user.role !== 'seller') {
+        toast.error("Not authorized");
+        setLoading(false);
+        return;
+      }
+  
       localStorage.setItem('user', JSON.stringify(user));
-
+  
       toast.success("Login Success!");
-
+  
       // Call the login function from the AuthenticationContext
       login(user);
-
+  
       // Navigate to the home page
       navigate("/");
-
+  
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "An error occurred during login");
     } finally {
       setLoading(false);
     }
   };
-
+  
   return (
     <div className="login-container">
       <div className="login-box">

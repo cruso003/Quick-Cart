@@ -8,6 +8,7 @@ import productRoute from "./src/routes/product.route.js";
 import storeRoute from "./src/routes/store.route.js";
 import categoryRoute from "./src/routes/category.route.js";
 import subcategoryRoute from "./src/routes/subcategory.route.js";
+import { approveSeller } from './src/controllers/auth.controller.js';
 
 // Initialize Express
 const app = express();
@@ -38,6 +39,9 @@ app.use('/api/v1/categories', categoryRoute);
 app.use('/api/v1/subcategories', subcategoryRoute);
 // Use `upload.array()` for multiple images
 app.use('/api/v1/products', productRoute);
+app.get('/api/v1/approve-seller/:token', approveSeller
+);
+
 
 // Start the server
 const PORT = process.env.PORT

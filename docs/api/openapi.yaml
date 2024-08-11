@@ -1924,14 +1924,14 @@ paths:
               properties:
                 title:
                   type: string
-                category:
+                categoryId:
                   type: string
                 file:
                   type: string
                   format: binary
               required:
                 - title
-                - category
+                - categoryId
       responses:
         "201":
           description: Subcategory created successfully
@@ -1946,7 +1946,7 @@ paths:
                     type: string
                   imageUrl:
                     type: string
-                  category:
+                  categoryId:
                     type: string
         "500":
           description: Internal server error
