@@ -1,6 +1,4 @@
 import express from 'express';
-import multer from 'multer';
-import path from 'path';
 
 import swaggerRoute from './src/routes/swagger.route.js';
 import userRoute from "./src/routes/user.route.js";
@@ -17,16 +15,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Setup multer for handling multipart/form-data
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/');
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-  }
-});
-const upload = multer({ storage });
+
 
 // Default route to serve the OpenAPI documentation
 app.use('/', swaggerRoute);
@@ -35,10 +24,10 @@ app.use('/', swaggerRoute);
 app.use('/api/user', userRoute);
 app.use('/api/auth', authRoute);
 app.use('/api/stores', storeRoute);
-app.use('/api/categories',upload.single("image"),categoryRoute);
-app.use('/api/subcategories',upload.single("image"),subcategoryRoute);
+app.use('/api/categories', categoryRoute);
+app.use('/api/subcategories', subcategoryRoute);
 // Use `upload.array()` for multiple images
-app.use('/api/products', upload.array('file', 10), productRoute);
+app.use('/api/products', productRoute);
 
 // Start the server
 const PORT = process.env.PORT

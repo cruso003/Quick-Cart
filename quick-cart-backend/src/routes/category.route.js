@@ -1,5 +1,6 @@
 import express from "express";
-import { createCategory, deleteCategory, getCategories } from "../controllers/category.controller";
+import { createCategory, deleteCategory, getCategories } from "../controllers/category.controller.js";
+import upload from "../middleware/upload.js";
 
 const router = express.Router();
 
@@ -7,7 +8,7 @@ const router = express.Router();
 router.get("/", getCategories);
 
 // Create a new category
-router.post("/", createCategory);
+router.post("/create", upload.single('file'), createCategory);
 
 // Delete category by ID
 router.delete("/:id", deleteCategory);
