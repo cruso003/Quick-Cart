@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 
 import swaggerRoute from './src/routes/swagger.route.js';
 import userRoute from "./src/routes/user.route.js";
@@ -14,7 +15,7 @@ const app = express();
 // Middleware for parsing JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(cors({origin: process.env.CLIENT_URL, credentials:true }));
 
 
 // Default route to serve the OpenAPI documentation
@@ -28,6 +29,15 @@ app.use('/api/categories', categoryRoute);
 app.use('/api/subcategories', subcategoryRoute);
 // Use `upload.array()` for multiple images
 app.use('/api/products', productRoute);
+
+//Vendor route
+app.use('/api/v1/user', userRoute);
+app.use('/api/v1/auth', authRoute);
+app.use('/api/v1/stores', storeRoute);
+app.use('/api/v1/categories', categoryRoute);
+app.use('/api/v1/subcategories', subcategoryRoute);
+// Use `upload.array()` for multiple images
+app.use('/api/v1/products', productRoute);
 
 // Start the server
 const PORT = process.env.PORT
