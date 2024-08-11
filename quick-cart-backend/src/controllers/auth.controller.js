@@ -1,6 +1,9 @@
 import bcrypt from "bcryptjs";
 import prisma from "../../lib/prisma.js";
 import jwt from "jsonwebtoken";
+import crypto from 'crypto';
+import sendApprovalMail from "../utilities/sendApprovalMail.js";
+import sendMail from "../utilities/sendMail.js";
 
 // Register a new user
 export const registerUser = async (req, res) => {
@@ -84,14 +87,14 @@ export const logoutUser = (req, res) => {
 // Create a seller
 export const createSeller = async (req, res) => {
   const {
-    name, // Store owner's name
+    name,
     email,
     password,
     businessName,
     phoneNumber,
     address,
-    city, // Add the city field
-    state, // Add the state field as it's also in your Store model
+    city,
+    state,
   } = req.body;
 
   try {
@@ -104,7 +107,10 @@ export const createSeller = async (req, res) => {
         .status(400)
         .json({ success: false, message: "User already exists" });
 
-    // Create the seller (user)
+    // Create a unique token for approval
+    const approvalToken = crypto.randomBytes(32).toString('hex');
+
+    // Create the seller (user) with isApproved set to false
     const seller = await prisma.user.create({
       data: {
         name,
@@ -113,20 +119,24 @@ export const createSeller = async (req, res) => {
         businessName,
         phoneNumber,
         address,
+        city,
+        state,
         role: "seller",
+        isApproved: false,
+        approvalToken, 
       },
     });
 
     // Create the store with the correct owner name and reference, including the email field
     const store = await prisma.store.create({
       data: {
-        name, // Store owner's name
+        name,
         businessName,
         phoneNumber,
         address,
         email,
-        city,  // Include the city field
-        state, // Include the state field
+        city,
+        state,
         ownerId: seller.id,
       },
     });
@@ -137,7 +147,50 @@ export const createSeller = async (req, res) => {
       data: { storeId: store.id },
     });
 
-    res.status(201).json({ message: "Seller account created successfully" });
+    // Send approval request email to admin
+    await sendApprovalMail({
+      to: process.env.ADMIN_EMAIL,
+      subject: "Approval Request for New Seller",
+      sellerName: name,
+      approvalLink: `${process.env.APP_URL}/approve-seller/${approvalToken}`,
+    });
+
+    res.status(201).json({ message: "Seller account created successfully, pending approval." });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Approve a seller
+export const approveSeller = async (req, res) => {
+  const { token } = req.params;
+
+  try {
+    const seller = await prisma.user.findFirst({
+      where: { approvalToken: token },
+    });
+
+    if (!seller) {
+      return res.status(400).json({ message: "Invalid or expired token." });
+    }
+
+    // Update the seller to be approved
+    await prisma.user.update({
+      where: { id: seller.id },
+      data: {
+        isApproved: true,
+        approvalToken: null,
+      },
+    });
+
+    // Notify the seller
+    await sendMail({
+      email: seller.email,
+      subject: "Your Seller Account Has Been Approved",
+      message: `Congratulations ${seller.name}, your seller account has been approved!`,
+    });
+
+    res.status(200).json({ message: "Seller approved successfully." });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

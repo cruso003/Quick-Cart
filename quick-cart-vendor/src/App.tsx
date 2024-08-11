@@ -10,6 +10,7 @@ import Login from './pages/login/Login';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/protectedRoute/ProtectedRoute';
 import Signup from './pages/signUp/SignUp';
+import Profile from './pages/profile/Profile';
 
 const Layout = () => {
   return (
@@ -37,7 +38,10 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      
+      {
+        path: "/profile",
+        element: <Profile />,
+      },
     ],
   },
   
@@ -53,6 +57,7 @@ const router = createBrowserRouter([
     path: "/signup",
     element: <Signup />,
   },
+  
   
 ]);
 function App() {

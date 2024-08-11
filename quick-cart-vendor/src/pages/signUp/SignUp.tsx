@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
 import './signup.scss';
 import { authApiRequests } from '../../api/api';
@@ -51,7 +52,7 @@ const Signup: React.FC = () => {
         city,
         state,
       });
-      toast.success("Signup Success!");
+      toast.success("Seller account created successfully, pending approval.");
 
       // Navigate to the login page after successful signup
       navigate("/login");
