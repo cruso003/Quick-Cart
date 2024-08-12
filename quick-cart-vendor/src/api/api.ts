@@ -19,9 +19,9 @@ const userRoutes = {
     getUsers: "/user/get-users",
     getUserById: "/user/:userId",
     updateUserByEmail: "/user/:email",
-    forgotPassword: "/auth/forgot-password",
-    verifyOtpAndResetPassword: "/auth/verify-otp-reset-password",
-    resendSecurityCode: "/auth/resend-security-code",
+    forgotPassword: "/user/forgot-password",
+    verifyOtpAndResetPassword: "/user/verify-otp-reset-password",
+    resendSecurityCode: "/user/resend-security-code",
 }
 
 // Functions to make API requests for authentication
