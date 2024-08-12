@@ -27,7 +27,9 @@ export const createProduct = async (req, res) => {
       totalSale,
     } = req.body;
 
-    // Parse variations if it's a string
+    console.log('Request Body:', req.body);
+
+    // Handle variations
     if (typeof variations === 'string') {
       try {
         variations = JSON.parse(variations);
@@ -43,8 +45,6 @@ export const createProduct = async (req, res) => {
     featured = featured === 'true';
     totalSale = totalSale ? parseInt(totalSale, 10) : 0;
 
-    console.log(req.body);
-
     // Validate input
     if (!name || !description || isNaN(price) || !sellerId) {
       return res
@@ -52,7 +52,7 @@ export const createProduct = async (req, res) => {
         .json({ error: "Please provide name, description, price, and seller" });
     }
 
-    // Check if variations are provided and it's an array
+    // Check if variations are valid
     if (
       variations !== undefined &&
       (!Array.isArray(variations) ||
@@ -64,17 +64,16 @@ export const createProduct = async (req, res) => {
       return res.status(400).json({ error: "Invalid variations format" });
     }
 
-    // Find the corresponding store using the selected store name
+    // Find the corresponding store
     const store = await prisma.store.findUnique({
       where: { id: sellerId },
     });
 
-    // Check if the store exists
     if (!store) {
       return res.status(400).json({ error: "Selected seller does not exist" });
     }
 
-    // Upload images to Cloudinary (assuming req.files exists and is an array)
+    // Upload images
     const uploadedImages = req.files
       ? await Promise.all(
           req.files.map(async (file) => {
@@ -95,16 +94,19 @@ export const createProduct = async (req, res) => {
         )
       : [];
 
-    // Create a new Product instance
+    // Create a new Product
     const newProduct = await prisma.product.create({
       data: {
         name,
         description,
         price,
         discountPrice: discount_price,
-        category,
-        subcategory,
-        variations,
+        category: {
+          connect: { id: category },
+        },
+        subcategory: {
+          connect: { id: subcategory },
+        },
         brand,
         condition,
         featured,
@@ -119,19 +121,16 @@ export const createProduct = async (req, res) => {
         store: {
           connect: { id: store.id },
         },
+        ...(variations?.length ? { variations: { create: variations } } : {}),
       },
     });
 
-    // Send the saved product as a response
     res.status(201).json(newProduct);
   } catch (error) {
-    console.log("error.message", error.message);
     console.error("Error creating product:", error);
     res.status(500).json({ error: error.message });
   }
 };
-
-
 
 // Get all products
 export const getProducts = async (req, res) => {

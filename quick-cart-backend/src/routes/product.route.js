@@ -10,10 +10,10 @@ router.get('/', getProducts);
 router.get('/search', searchProducts);
 
 // Create a new product
-router.post("/", upload.array('file', 10), createProduct);
+router.post("/", upload.array('images', 10), createProduct);
 
 // Update product by ID
-router.put("/:id", upload.array('file', 10), updateProduct);
+router.put("/:id", upload.array('images', 10), updateProduct);
 
 // Delete product by ID
 router.delete("/:id", deleteProduct);
