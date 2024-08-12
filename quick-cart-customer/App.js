@@ -1,20 +1,19 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from "react";
+import { NavigationContainer } from '@react-navigation/native';
+import HomeStack from "./navigation/stackNavigation/HomeStack";
 
 export default function App() {
+  const [initializing, setInitializing] = useState(true);
+
+  useEffect(() => {
+    setInitializing(false);
+  }, []);
+
+  if (initializing) return null;
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to resume work!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <HomeStack />
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
