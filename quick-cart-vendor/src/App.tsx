@@ -13,6 +13,8 @@ import Signup from './pages/signUp/SignUp';
 import Profile from './pages/profile/Profile';
 import ForgotPassword from './pages/forgotPassword/ForgotPassword';
 import ResetPassword from './pages/resetpassword/ResetPassword';
+import NewProduct from './components/New/NewProduct';
+import Products from './components/dataTable/productTable';
 
 const Layout = () => {
   return (
@@ -43,6 +45,14 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <Profile />,
+      },
+      {
+        path: "/products/add-product",
+        element: <NewProduct />,
+      },
+      {
+        path: "/products",
+        element: <Products />,
       },
     ],
   },
