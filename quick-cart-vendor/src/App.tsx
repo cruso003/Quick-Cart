@@ -11,6 +11,8 @@ import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/protectedRoute/ProtectedRoute';
 import Signup from './pages/signUp/SignUp';
 import Profile from './pages/profile/Profile';
+import ForgotPassword from './pages/forgotPassword/ForgotPassword';
+import ResetPassword from './pages/resetpassword/ResetPassword';
 
 const Layout = () => {
   return (
@@ -57,7 +59,13 @@ const router = createBrowserRouter([
     path: "/signup",
     element: <Signup />,
   },
-  
+  {
+    path: "/forgot-password",
+    element: <ForgotPassword/>,
+  },
+  {path: "/reset-password",
+    element: <ResetPassword/>,
+  }
   
 ]);
 function App() {
