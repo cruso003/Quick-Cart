@@ -1,5 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
+// Other imports...
 import BottomTab from "../tabBar/BottomTab";
+import { LoginScreen } from "../../src/screens/auth/index.js";
 
 const Stack = createNativeStackNavigator();
 
@@ -28,7 +31,7 @@ export default function HomeStack() {
           name="AccountScreen"
           component={BottomTab}
         />
-
+        <Stack.Screen name="Login" component={LoginScreen} />
       </Stack.Group>
 
       {/* NotificationStack */}
