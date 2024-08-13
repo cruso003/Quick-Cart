@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   StyleSheet,
   Platform,
@@ -9,7 +9,7 @@ import {
   StatusBar,
   TouchableNativeFeedback,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import {
   MaterialIcons,
   MaterialCommunityIcons,
@@ -32,22 +32,25 @@ function Account() {
   const navigation = useNavigation();
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const userData = await AsyncStorage.getItem("userData");
-        if (userData) {
-          const parsedUser = JSON.parse(userData);
-          setUser(parsedUser);
-        } else {
-          setUser(null);
-        }
-      } catch (error) {
-        console.error("Error retrieving user data:", error);
+  const getData = useCallback(async () => {
+    try {
+      const userData = await AsyncStorage.getItem("userData");
+      if (userData) {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+      } else {
+        setUser(null);
       }
-    };
-    getData();
+    } catch (error) {
+      console.error("Error retrieving user data:", error);
+    }
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      getData();
+    }, [getData])
+  );
 
   const handleLoginOrLogout = async () => {
     if (user) {
@@ -111,7 +114,7 @@ function Account() {
       </View>
 
       <ScrollView>
-        <View style={{ flexDirection: "row", justifyContent: "space-between", backgroundColor: "#fff" }}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", backgroundColor: "#fff", alignItems: 'center' }}>
           <View style={[styles.centerElement, { height: 40, flexDirection: "row", paddingHorizontal: 15 }]}>
             <FontAwesome5 name="clipboard-list" size={20} color="#1b59ab" />
             <Text style={{ fontSize: 15, color: "#282828", marginLeft: 10 }}>My Purchases</Text>
@@ -133,6 +136,7 @@ function Account() {
             height: 100,
             borderColor: "#f6f6f6",
             borderWidth: 1,
+            alignItems: 'center'
           }}
         >
           {/*Items pending Payment */}

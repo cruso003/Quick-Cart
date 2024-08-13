@@ -8,6 +8,7 @@ const Navbar = () => {
     <div className="navbar">
       <div className="logo">
        <Link to="/">
+       <img src="./logo-black.svg" alt="logo"/>
        <span>Quick-Cart Vendor</span>
        </Link>
       </div>
