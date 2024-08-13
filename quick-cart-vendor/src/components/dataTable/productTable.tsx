@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import "./dataTable.scss";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import { Link } from "react-router-dom";
@@ -12,7 +13,7 @@ const productColumns: GridColDef[] = [
     return <img src={params.row.img} alt='' style={{ width: 50, height: 50, borderRadius: "50%" }} />;
   }},
   {
-    field: "title",
+    field: "name",
     headerName: "Product",
     width: 200,
     type: "string"
@@ -30,8 +31,8 @@ const productColumns: GridColDef[] = [
     type: "string"
   },
   {
-    field: "category",
-    headerName: "Categories",
+    field: "total_sale",
+    headerName: "Total Sale",
     width: 200,
     type: "string"
   },
@@ -43,13 +44,14 @@ const Products: React.FC = () => {
   const fetchProducts = async () => {
     try {
       const response = await productApiRequests.getProducts();
+      
       /// Transform the fetched data to match the productRows format
       const transformedData = response.data.map((product: any) => ({
-        id: product._id,
+        id: product.id,
         name: product.name,
         img: product.images ? product.images[0] : "",
         description: product.description,
-        seller: product.store,
+        total_sale: product.totalSale,
         price: product.discount_price ? product.discount_price : product.price,
       }));
       setProducts(transformedData);
