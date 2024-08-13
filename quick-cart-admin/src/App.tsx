@@ -1,35 +1,97 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import './styles/global.scss';
+import Navbar from './components/navbar/NavBar';
+import Menu from './components/menu/Menu';
+import Footer from './components/footer/Footer';
+import NotFound from './components/notFound/NotFound';
+import Login from './pages/login/Login';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/protectedRoute/ProtectedRoute';
+import Profile from './pages/profile/Profile';
+import ForgotPassword from './pages/forgotPassword/ForgotPassword';
+import ResetPassword from './pages/resetpassword/ResetPassword';
+import NewProduct from './components/New/NewProduct';
+import Products from './components/dataTable/productTable';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+const Layout = () => {
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="main">
+      <Navbar />
+      <div className="container">
+        <div className="menuContainer">
+          <Menu />
+        </div>
+        <div className="contentContainer">
+          <Outlet />
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+      <Footer />
+    </div>
+  );
+};
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: (
+      <ProtectedRoute>
+        <Layout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        path: "/profile",
+        element: <Profile />,
+      },
+      {
+        path: "/products/add-product",
+        element: <NewProduct />,
+      },
+      {
+        path: "/products",
+        element: <Products />,
+      },
+    ],
+  },
+  
+  {
+    path: "*",
+    element: <NotFound/>
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPassword/>,
+  },
+  {path: "/reset-password",
+    element: <ResetPassword/>,
+  }
+  
+]);
+function App() {
+  return (
+    <AuthProvider>
+        <RouterProvider router={router} />
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
+    </AuthProvider>
   )
+  
 }
 
 export default App
