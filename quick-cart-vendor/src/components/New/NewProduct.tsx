@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import "./new.scss";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
 import { Key, useEffect, useState } from "react";
@@ -30,7 +31,7 @@ const AddProduct = () => {
   const fetchCategories = async () => {
     try {
       const response = await categoryApiRequests.getCategories();
-  
+
       if (Array.isArray(response.data)) {
         const transformedData = response.data.map((category: any) => {
           const subcategoryData = Array.isArray(category.subcategories)
@@ -46,7 +47,7 @@ const AddProduct = () => {
             subcategories: subcategoryData,
           };
         });
-  
+
         setCategories(transformedData);
       } else {
         console.error("Unexpected response format:", response.data);
@@ -55,7 +56,6 @@ const AddProduct = () => {
       console.error("Error fetching categories:", error);
     }
   };
-  
 
   useEffect(() => {
     fetchCategories();
@@ -83,15 +83,15 @@ const AddProduct = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-  
+
     if (name === "category") {
       const selectedCategory = categories.find(
         (category: any) => category.category === value
       );
-  
+
       if (selectedCategory) {
         setSubcategories(selectedCategory.subcategories || []);
-  
+
         setFormData({
           ...formData,
           category: selectedCategory.id,
@@ -102,7 +102,7 @@ const AddProduct = () => {
       const selectedSubcategory = subcategories.find(
         (subcategory: any) => subcategory.title === value
       );
-  
+
       setFormData({
         ...formData,
         subcategory: selectedSubcategory ? selectedSubcategory.id : "",
@@ -114,11 +114,20 @@ const AddProduct = () => {
       });
     }
   };
-  
 
-  const handleVariationChange = (index: number, key: string, value: string) => {
+  const handleVariationChange = (
+    index: number,
+    key: "name" | "options",
+    value: string | string[]
+  ) => {
     const newVariations = [...formData.variations];
-    newVariations[index][key] = value;
+    if (key === "options") {
+      newVariations[index][key] = Array.isArray(value)
+        ? value
+        : value.split(", ");
+    } else {
+      newVariations[index][key] = value as string;
+    }
     setFormData({
       ...formData,
       variations: newVariations,
@@ -159,7 +168,6 @@ const AddProduct = () => {
     });
   };
 
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -195,7 +203,8 @@ const AddProduct = () => {
         price: "",
         discount_price: "",
         stock: "",
-        sellerId: "",         variations: [],
+        sellerId: "",
+        variations: [],
         condition: "",
         brand: "",
         images: [],
@@ -204,14 +213,11 @@ const AddProduct = () => {
       // Handle success
       toast.success("Product Added Successfully");
     } catch (error: any) {
-      console.error("Error adding new product:", error);
-      toast.error(error.response?.data?.message || "An error occurred");
+      toast.error(error.response?.data?.error || "An error occurred");
     } finally {
       setLoading(false);
     }
   };
-
-  
 
   return (
     <div className="new">
@@ -290,22 +296,22 @@ const AddProduct = () => {
                   <div className="formColumn">
                     <label>Subcategory:</label>
                     <select
-  name="subcategory"
-  value={
-    subcategories.find(
-      (subcategory) => subcategory.id === formData.subcategory
-    )?.title || ""
-  }
-  onChange={handleChange}
->
-  <option value="">Select Subcategory</option>
-  {subcategories.map((subcategory: any, index: Key) => (
-    <option key={index} value={subcategory.title}>
-      {subcategory.title}
-    </option>
-  ))}
-</select>
-
+                      name="subcategory"
+                      value={
+                        subcategories.find(
+                          (subcategory) =>
+                            subcategory.id === formData.subcategory
+                        )?.title || ""
+                      }
+                      onChange={handleChange}
+                    >
+                      <option value="">Select Subcategory</option>
+                      {subcategories.map((subcategory: any, index: Key) => (
+                        <option key={index} value={subcategory.title}>
+                          {subcategory.title}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
                 <div className="formRow">
@@ -385,51 +391,47 @@ const AddProduct = () => {
                   <div className="formColumn">
                     <label>Variations:</label>
                     {formData.variations.map((variation, index) => (
-                      <div key={index} className="variationContainer">
+                      <div key={index}>
                         <input
                           type="text"
-                          placeholder="Enter variation name"
+                          placeholder="Variation Name"
                           value={variation.name}
                           onChange={(e) =>
-                            handleVariationChange(
-                              index,
-                              "name",
-                              e.target.value
-                            )
+                            handleVariationChange(index, "name", e.target.value)
                           }
                         />
-                        {variation.options.map(
-                          (option: string, optionIndex: number) => (
-                            <div key={optionIndex} className="optionContainer">
+                        <div>
+                          {variation.options.map((option: any, optionIndex: any) => (
+                            <div key={optionIndex}>
                               <input
                                 type="text"
-                                placeholder="Enter option"
+                                placeholder="Option"
                                 value={option}
                                 onChange={(e) =>
                                   handleVariationChange(
                                     index,
                                     "options",
-                                    e.target.value
+                                    variation.options.map((opt: any, i: Key | null | undefined) =>
+                                      i === optionIndex ? e.target.value : opt
+                                    )
                                   )
                                 }
                               />
                               <button
                                 type="button"
-                                onClick={() =>
-                                  removeOption(index, optionIndex)
-                                }
+                                onClick={() => removeOption(index, optionIndex)}
                               >
                                 Remove Option
                               </button>
                             </div>
-                          )
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => addOption(index)}
-                        >
-                          Add Option
-                        </button>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={() => addOption(index)}
+                          >
+                            Add Option
+                          </button>
+                        </div>
                         <button
                           type="button"
                           onClick={() => removeVariation(index)}
@@ -438,6 +440,7 @@ const AddProduct = () => {
                         </button>
                       </div>
                     ))}
+
                     <button type="button" onClick={addVariation}>
                       Add Variation
                     </button>
