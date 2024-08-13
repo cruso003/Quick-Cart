@@ -1,19 +1,66 @@
-import React from "react";
-import { StyleSheet, Platform, Text, View, ScrollView, SafeAreaView, StatusBar, TouchableNativeFeedback } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+import React, { useEffect, useState } from "react";
+import {
+  StyleSheet,
+  Platform,
+  Text,
+  View,
+  ScrollView,
+  SafeAreaView,
+  StatusBar,
+  TouchableNativeFeedback,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { MaterialIcons, MaterialCommunityIcons, AntDesign, Feather, FontAwesome5, FontAwesome, Ionicons } from "@expo/vector-icons";
+import {
+  MaterialIcons,
+  MaterialCommunityIcons,
+  AntDesign,
+  Feather,
+  FontAwesome5,
+  FontAwesome,
+  Entypo,
+  Ionicons,
+} from "@expo/vector-icons";
 import TouchablePlatformSpecific from "../../components/TouchablePlatformSpecific";
 import IconBadge from "../../components/IconBadge";
 import NavigationButton from "../../components/NavigationButton";
 import ProfileSection from "../../components/ProfileSection";
 import colors from "../../../theme/colors";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import ListItem from "../../components/ListItem";
 
 function Account() {
   const navigation = useNavigation();
+  const [user, setUser] = useState(null);
 
-  const handleLoginOrLogout = () => {
-    navigation.navigate("Login");
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const userData = await AsyncStorage.getItem("userData");
+        if (userData) {
+          const parsedUser = JSON.parse(userData);
+          setUser(parsedUser);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error("Error retrieving user data:", error);
+      }
+    };
+    getData();
+  }, []);
+
+  const handleLoginOrLogout = async () => {
+    if (user) {
+      // Log out the user
+      await AsyncStorage.removeItem("userData");
+
+      {/* Update the state to reflect that the user has logged out*/}
+      setUser(null);
+      navigation.navigate("Login");
+    } else {
+      // Navigate to login screen
+      navigation.navigate("Login");
+    }
   };
 
   const handleMessageOpen = () => {
@@ -34,11 +81,10 @@ function Account() {
     >
       {/*Header Section*/}
 
-      <View style={{height:60, backgroundColor: colors.danger}} >
+      <View style={{ height: 60, backgroundColor: colors.danger }}>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-
           {/*Render Profile Section*/}
-         <ProfileSection />
+          <ProfileSection user={user} />
 
           <View style={{ flexDirection: "row" }}>
             <TouchablePlatformSpecific
@@ -61,7 +107,7 @@ function Account() {
               />
             </TouchablePlatformSpecific>
           </View>
-        </View>     
+        </View>
       </View>
 
       <ScrollView>
@@ -79,7 +125,16 @@ function Account() {
           />
         </View>
 
-        <View style={{ flexDirection: "row", justifyContent: "space-around", backgroundColor: "#fff", height: 100, borderColor: "#f6f6f6", borderWidth: 1 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-around",
+            backgroundColor: "#fff",
+            height: 100,
+            borderColor: "#f6f6f6",
+            borderWidth: 1,
+          }}
+        >
           {/*Items pending Payment */}
           <TouchablePlatformSpecific
             //onPress={() => (cartLength > 0 ? navigation.navigate("Cart") : {})}
@@ -166,106 +221,40 @@ function Account() {
             </View>
           </TouchablePlatformSpecific>
         </View>
-        <View style={{ backgroundColor: "#f6f6f6", paddingHorizontal: 16 }}>
-          {/*User Wallet */}
-          <TouchablePlatformSpecific
-            //onPress={() => navigation.navigate("Profile")}
-            background={TouchableNativeFeedback.Ripple("#ccc", false)}
-            useForeground={true}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                paddingTop: 12,
-                paddingBottom: 12,
-                borderBottomWidth: 1,
-                borderColor: "#f6f6f6",
-                alignItems: "center",
-              }}
-            >
-              <MaterialIcons name="payment" size={22} color={colors.primaryColor} />
-              <Text style={[styles.boldText, { marginLeft: 16 }]}>My Wallet</Text>
-            </View>
-          </TouchablePlatformSpecific>
 
-          {/*User Wishlist */}
-          <TouchablePlatformSpecific
-            //onPress={() => navigation.navigate("Wishlist")}
-            background={TouchableNativeFeedback.Ripple("#ccc", false)}
-            useForeground={true}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                paddingTop: 12,
-                paddingBottom: 12,
-                borderBottomWidth: 1,
-                borderColor: "#f6f6f6",
-                alignItems: "center",
-              }}
-            >
-              <MaterialIcons name="favorite-border" size={22} color={colors.primaryColor} />
-              <Text style={[styles.boldText, { marginLeft: 16 }]}>Wishlist</Text>
-            </View>
-          </TouchablePlatformSpecific>
-          {/* Help */}
-          <TouchablePlatformSpecific
-            //onPress={() => navigation.navigate("AddressBook")}
-            background={TouchableNativeFeedback.Ripple("#ccc", false)}
-            useForeground={true}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                paddingTop: 12,
-                paddingBottom: 12,
-                borderBottomWidth: 1,
-                borderColor: "#f6f6f6",
-                alignItems: "center",
-              }}
-            >
-              <AntDesign name="questioncircleo" size={22} color={colors.primaryColor} />
-              <Text style={[styles.boldText, { marginLeft: 16 }]}>Help</Text>
-            </View>
-          </TouchablePlatformSpecific>
-          <TouchablePlatformSpecific
-            //onPress={() => navigation.navigate("Settings")}
-            background={TouchableNativeFeedback.Ripple("#ccc", false)}
-            useForeground={true}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                paddingTop: 12,
-                paddingBottom: 12,
-                borderBottomWidth: 1,
-                borderColor: "#f6f6f6",
-                alignItems: "center",
-              }}
-            >
-              <MaterialIcons name="settings" size={22} color={colors.primaryColor} />
-              <Text style={[styles.boldText, { marginLeft: 16 }]}>Account Settings</Text>
-            </View>
-          </TouchablePlatformSpecific>
-          <TouchablePlatformSpecific
+        {/* List Sections */}
+        <View style={{ backgroundColor: "#f6f6f6", paddingHorizontal: 16 }}>
+         {/* Using ListItem Component */}
+          <ListItem
+            iconName="payment"
+            iconComponent={MaterialIcons}
+            label="My Wallet"
+            onPress={() => navigation.navigate("Wallet")}
+          />
+          <ListItem
+            iconName="favorite-border"
+            iconComponent={MaterialIcons}
+            label="My Wishlist"
+            onPress={() => navigation.navigate("Wishlist")}
+          />
+          <ListItem
+            iconName="gear"
+            iconComponent={FontAwesome}
+            label="Profile Settings"
+            onPress={() => navigation.navigate("ProfileSettings")}
+          />
+          <ListItem
+            iconName="help-with-circle"
+            iconComponent={Entypo}
+            label="Help Center"
+            onPress={() => navigation.navigate("Help")}
+          />
+          <ListItem
+            iconName={user ? "logout" : "login"}
+            iconComponent={AntDesign}
+            label={user ? "Logout" : "Login"}
             onPress={handleLoginOrLogout}
-            background={TouchableNativeFeedback.Ripple("#ccc", false)}
-            useForeground={true}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                paddingTop: 12,
-                paddingBottom: 12,
-                borderBottomWidth: 1,
-                borderColor: "#f6f6f6",
-                alignItems: "center",
-              }}
-            >
-              <AntDesign name="login" size={22} color={colors.primaryColor} />
-              <Text style={[styles.boldText, { marginLeft: 16 }]}>Login</Text>
-            </View>
-          </TouchablePlatformSpecific>
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -273,13 +262,10 @@ function Account() {
 }
 
 const styles = StyleSheet.create({
+  centerElement: { justifyContent: "center", alignItems: "center" },
   boldText: {
-    fontSize: 15,
+    fontSize: 16,
     color: "#282828",
-  },
-  centerElement: {
-    justifyContent: "center",
-    alignItems: "center",
   },
 });
 
