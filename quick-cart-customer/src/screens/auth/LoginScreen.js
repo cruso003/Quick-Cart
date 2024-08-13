@@ -15,7 +15,6 @@ import AppFormField from "../../components/form/AppFormField";
 import * as Yup from "yup";
 import tailwind from "twrnc";
 import SubmitButton from "../../components/button/SubmitButton";
-import FlashMessage, { showMessage } from "react-native-flash-message";
 import Divider from "../../components/divider/Divider";
 import authApi from "../../../api/auth/auth";
 
@@ -36,10 +35,6 @@ const LoginScreen = () => {
       setLoading(true);
 
       const response = await authApi.login(values.email, values.password);
-
-      console.log(response.data);
-      
-      
 
       const data = response.data;
       {/* Save the user data in local storage */}
@@ -125,7 +120,6 @@ const LoginScreen = () => {
           </View>
         </View>
       </View>
-      <FlashMessage position="top" />
     </View>
   );
 };
@@ -190,7 +184,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   errorText: {
-    color: colors.red,
+    color: colors.danger,
     marginLeft: 16,
     marginTop: 16,
   },

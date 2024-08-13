@@ -1,8 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-// Other imports...
 import BottomTab from "../tabBar/BottomTab";
-import { LoginScreen } from "../../src/screens/auth/index.js";
+import { LoginScreen, RegisterScreen } from "../../src/screens/auth/index.js";
+import { ForgotPassword, VerifyOtp } from "../../src/screens/user/index";
 
 const Stack = createNativeStackNavigator();
 
@@ -32,6 +32,9 @@ export default function HomeStack() {
           component={BottomTab}
         />
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+        <Stack.Screen name="VerifyOtp" component={VerifyOtp} />
       </Stack.Group>
 
       {/* NotificationStack */}

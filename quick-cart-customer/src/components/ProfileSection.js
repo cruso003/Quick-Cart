@@ -3,6 +3,7 @@ import { View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 const ProfileSection = ({ user }) => {
+  
   const icon = "person-circle";
 
   return (

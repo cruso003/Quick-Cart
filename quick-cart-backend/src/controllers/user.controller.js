@@ -81,11 +81,7 @@ export const updateAddressById = async (req, res) => {
         const { name, street, landmark, city, state, mobileNo, postalCode } = req.body;
 
         const user = await prisma.user.update({
-            where: {
-                deliveryAddresses: {
-                    id: addressId
-                }
-            },
+            where: { id: req.userId },
             data: {
                 deliveryAddresses: {
                     update: {
@@ -108,11 +104,7 @@ export const removeAddressById = async (req, res) => {
         const addressId = parseInt(req.params.addressId);
 
         const user = await prisma.user.update({
-            where: {
-                deliveryAddresses: {
-                    id: addressId
-                }
-            },
+            where: { id: req.userId },
             data: {
                 deliveryAddresses: {
                     delete: { id: addressId }
@@ -125,6 +117,7 @@ export const removeAddressById = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
 
 // Forgot password
 export const forgotPassword = async (req, res) => {
@@ -186,18 +179,28 @@ export const resendSecurityCode = async (req, res) => {
 
         if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
+        const now = new Date();
+        const isCodeValid = user.securityCodeExpires && user.securityCodeExpires > now;
+
+        if (isCodeValid) {
+            return res.status(400).json({ success: false, message: "A security code has already been sent. Please use the existing code." });
+        }
+
+        // Generate new security code and update in the database
         const securityCode = generateOTP();
         await prisma.user.update({
             where: { email },
             data: {
                 securityCode,
-                securityCodeExpires: new Date(Date.now() + 30 * 60 * 1000) // 30 minutes
+                securityCodeExpires: new Date(Date.now() + 30 * 60 * 1000)
             }
         });
 
+        // Send the new security code via email
         await sendSecurityCode(email, securityCode);
-        res.status(200).json({ success: true, message: "Security code resent" });
+        res.status(200).json({ success: true, message: "New security code sent to your email" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
