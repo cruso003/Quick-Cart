@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Text,
   View,
@@ -7,30 +7,50 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { Ionicons, AntDesign, Feather, SimpleLineIcons, MaterialIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { useCart } from './context/CartContext';
-import { useAuth } from '../auth/context';
-import NotificationItem from '../../components/notification/NotificationItems';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import styles from '../../components/notification/styles';
+import IconBadge from '../../components/IconBadge';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NotificationItem from '../../components/notification/NotificationItems';
+import colors from '../../../theme/colors';
 
 const Notifications = () => {
-  const { cart } = useCart();
   const [cartLength, setCartLength] = useState(0);
   const navigation = useNavigation();
-  const { user } = useAuth();
+  const [user, setUser] = useState(null);
+
+  const getData = useCallback(async () => {
+    try {
+      const userData = await AsyncStorage.getItem("userData");
+      if (userData) {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
+      console.error("Error retrieving user data:", error);
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      getData();
+    }, [getData])
+  );
 
   const handleMessageOpen = () => {
     navigation.navigate(user ? 'Messages' : 'Login');
   };
 
   useEffect(() => {
-    setCartLength(cart ? cart.length : 0);
-  }, [cart]);
+    // Placeholder for cart length from context
+  }, []);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <View style={styles.iconContainer}>
+        <View style={styles.headerContainer}>
           <Text style={styles.headerTitle}>Notifications</Text>
         </View>
         <View style={{ flexDirection: 'row' }}>
@@ -38,21 +58,25 @@ const Notifications = () => {
             style={styles.iconContainer}
             onPress={() => navigation.navigate('Cart')}
           >
-            <MaterialIcons name="shopping-cart-checkout" size={28} color="#000" />
-            {cartLength > 0 && (
-              <View style={styles.cartBadge}>
-                <Text style={styles.badgeText}>{cartLength}</Text>
-              </View>
-            )}
+            <IconBadge
+              IconComponent={MaterialIcons}
+              name="shopping-cart-checkout"
+              size={28}
+              color={colors.white}
+              badgeCount={cartLength}
+            />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.iconContainer}
             onPress={handleMessageOpen}
           >
-            <Ionicons name="chatbubbles" size={28} color="#000" />
-            <View style={styles.messageBadge}>
-              <Text style={styles.badgeText}>8</Text>
-            </View>
+            <IconBadge
+              IconComponent={Ionicons}
+              name="chatbubbles"
+              size={28}
+              color={colors.white}
+              badgeCount={8}
+            />
           </TouchableOpacity>
         </View>
       </View>

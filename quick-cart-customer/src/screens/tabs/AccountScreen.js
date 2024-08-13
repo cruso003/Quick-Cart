@@ -79,7 +79,6 @@ function Account() {
       style={{
         flex: 1,
         backgroundColor: "#f6f6f6",
-        marginTop: Platform.OS === "ios" ? 40 : StatusBar.currentHeight,
       }}
     >
       {/*Header Section*/}
