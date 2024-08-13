@@ -83,6 +83,25 @@ model Product {
   category    Category    @relation(fields: [categoryId], references: [id])
   subcategory Subcategory @relation(fields: [subcategoryId], references: [id])
   store       Store       @relation(fields: [storeId], references: [id])
+  banners     BannerOnProduct[]
+}
+
+model Banner {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  imageUrl      String
+  linkedProducts BannerOnProduct[]
+}
+
+model BannerOnProduct {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  bannerId  String   @db.ObjectId
+  productId String   @db.ObjectId
+
+  banner    Banner   @relation(fields: [bannerId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@unique([bannerId, productId])
 }
 
 model Variation {

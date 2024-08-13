@@ -9,6 +9,7 @@ import storeRoute from "./src/routes/store.route.js";
 import categoryRoute from "./src/routes/category.route.js";
 import subcategoryRoute from "./src/routes/subcategory.route.js";
 import { approveSeller } from './src/controllers/auth.controller.js';
+import bannerRoute from "./src/routes/banner.route.js";
 
 // Initialize Express
 const app = express();
@@ -30,6 +31,7 @@ app.use('/api/categories', categoryRoute);
 app.use('/api/subcategories', subcategoryRoute);
 // Use `upload.array()` for multiple images
 app.use('/api/products', productRoute);
+app.use('/api/banners', bannerRoute);
 
 //Vendor route
 app.use('/api/v1/user', userRoute);
@@ -41,7 +43,7 @@ app.use('/api/v1/subcategories', subcategoryRoute);
 app.use('/api/v1/products', productRoute);
 app.get('/api/v1/approve-seller/:token', approveSeller
 );
-
+app.use('/api/v1/banners', bannerRoute);
 
 // Start the server
 const PORT = process.env.PORT
