@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import "./new.scss";
+import "./product.scss";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
 import { Key, useEffect, useState } from "react";
 import { categoryApiRequests, productApiRequests } from "../../api/api";
 import { toast } from "react-toastify";
 import { useAuth } from "../../contexts/AuthContext";
 
-const AddProduct = () => {
+const NewProduct = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [subcategories, setSubcategories] = useState<any[]>([]);
@@ -220,8 +220,8 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="new">
-      <div className="newContainer">
+    <div className="product">
+      <div className="productContainer">
         <div className="top">
           <h1>Add a Product</h1>
         </div>
@@ -458,4 +458,4 @@ const AddProduct = () => {
   );
 };
 
-export default AddProduct;
+export default NewProduct
