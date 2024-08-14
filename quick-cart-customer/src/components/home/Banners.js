@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Image, TouchableOpacity } from "react-native";
 import Swiper from "react-native-swiper";
-import BannersApi from "../api/banners";
+import BannersApi from "../../../api/banner/banner";
 import { ActivityIndicator } from "react-native-paper";
 import colors from "../../../theme/colors";
 
@@ -42,10 +42,10 @@ const Banners = ({ navigation }) => {
     >
       {banners.map((banner) => (
         <TouchableOpacity
-          key={banner._id}
+          key={banner.id}
           onPress={() => {
             navigation.navigate("BannerProducts", {
-              bannerId: banner._id,
+              bannerId: banner.id,
             });
           }}
           style={{ borderWidth: 1 }}

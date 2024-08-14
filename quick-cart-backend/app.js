@@ -24,16 +24,6 @@ app.use(cors({origin: process.env.CLIENT_URL, credentials:true }));
 app.use('/', swaggerRoute);
 
 // General Routes
-app.use('/api/user', userRoute);
-app.use('/api/auth', authRoute);
-app.use('/api/stores', storeRoute);
-app.use('/api/categories', categoryRoute);
-app.use('/api/subcategories', subcategoryRoute);
-// Use `upload.array()` for multiple images
-app.use('/api/products', productRoute);
-app.use('/api/banners', bannerRoute);
-
-//Vendor route
 app.use('/api/v1/user', userRoute);
 app.use('/api/v1/auth', authRoute);
 app.use('/api/v1/stores', storeRoute);

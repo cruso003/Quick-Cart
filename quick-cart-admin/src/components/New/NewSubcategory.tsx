@@ -9,11 +9,12 @@ const NewSubcategory = () => {
   const [file, setFile] = useState<File | null>(null); 
   const [subcategoryData, setSubcategoryData] = useState({
     title: "",
-    category: "",
-    image: null as File | null,
+    categoryId: "",
+    file: null as File | null,
   });
   const [categories, setCategories] = useState<{ id: string; title: string }[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [loading, setLoading] = useState(false);
 
   // Fetch categories when the component mounts
   useEffect(() => {
@@ -48,31 +49,33 @@ const NewSubcategory = () => {
 
     setSubcategoryData((prevState) => ({
       ...prevState,
-      image: selectedFile,
+      file: selectedFile,
     }));
 
     setFile(selectedFile);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    setLoading(true)
     e.preventDefault();
 
     const formData = new FormData();
     formData.append("title", subcategoryData.title);
-    formData.append("category", selectedCategory);
-    if (subcategoryData.image) {
-      formData.append("image", subcategoryData.image);
+    formData.append("categoryId", selectedCategory);
+    if (subcategoryData.file) {
+      formData.append("file", subcategoryData.file);
     }
 
     try {
       await subcategoryApiRequests.createSubcategory(formData);
+      
       toast.success("Subcategory Added Successfully");
 
       // Reset the form and states
       setSubcategoryData({
         title: "",
-        category: "",
-        image: null,
+        categoryId: "",
+        file: null,
       });
       setFile(null);
       const inputElement = document.getElementById("fileInput") as HTMLInputElement;
@@ -82,7 +85,9 @@ const NewSubcategory = () => {
       setSelectedCategory("");
     } catch (error: any) {
       console.error("Error adding subcategory:", error);
-      toast.error(error.response?.data?.message || "An error occurred");
+      toast.error(error.response?.data?.error || "An error occurred");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -111,7 +116,7 @@ const NewSubcategory = () => {
                 </label>
                 <input
                   type="file"
-                  name="image"
+                  name="file"
                   id="fileInput"
                   onChange={handleImageChange}
                   accept="image/*"
@@ -150,7 +155,7 @@ const NewSubcategory = () => {
                   </div>
                 </div>
 
-                <button type="submit">Add Subcategory</button>
+                <button type="submit" disabled={loading}>{loading ? "Uploading" : "Add Subcategory"}</button>
               </div>
             </form>
           </div>

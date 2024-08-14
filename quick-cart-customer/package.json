@@ -26,6 +26,7 @@
     "react-native-flash-message": "^0.4.2",
     "react-native-paper": "^5.12.5",
     "react-native-ratings": "^8.1.0",
+    "react-native-swiper": "^1.6.0",
     "twrnc": "^4.5.0",
     "yup": "^1.4.0"
   },

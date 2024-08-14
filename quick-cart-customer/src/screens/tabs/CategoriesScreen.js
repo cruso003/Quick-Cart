@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   FlatList,
@@ -8,12 +8,12 @@ import {
   StatusBar,
   ActivityIndicator,
   Text,
-} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import CategoryItem from '../../components/categories/CategoryItem';
-import SubCategoryItem from '../../components/categories/SubcategoryItem';
-import colors from '../../../theme/colors';
-import { categoriesData } from '../../components/demo/DemoData';
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import CategoryItem from "../../components/categories/CategoryItem";
+import SubCategoryItem from "../../components/categories/SubcategoryItem";
+import colors from "../../../theme/colors";
+import categoryApi from "../../../api/category/category";
 
 const CategoriesScreen = () => {
   const navigation = useNavigation();
@@ -23,12 +23,21 @@ const CategoriesScreen = () => {
   const [loading, setLoading] = useState(false);
 
   const fetchCategories = async () => {
-    setLoading(true);
     try {
-      // Simulate API call with demo data
-      setCategories(categoriesData);
+      setLoading(true);
+      const response = (await categoryApi.getCategories()).data;
+ 
+      const result =
+        response &&
+        response.map((item) => ({
+          id: item.id,
+          name: item.title,
+          image: item.imageUrl,
+        }));
+
+      setCategories(result);
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error("Error fetching categories:", error);
     } finally {
       setLoading(false);
     }
@@ -38,36 +47,43 @@ const CategoriesScreen = () => {
     fetchCategories();
   }, []);
 
-  const toggleSubCategories = (categoryId) => {
-    if (subcategories[categoryId]) {
-      // Hide subcategories
-      setSubcategories({ ...subcategories, [categoryId]: null });
-    } else {
-      // Show subcategories using demo data
-      const category = categories.find(
-        (category) => category.id === categoryId
-      );
-      const categorySubcategories = category?.subCategories || [];
-      setSubcategories({ ...subcategories, [categoryId]: categorySubcategories });
+  const fetchSubCategory = async (categoryId) => {
+    try {
+        const response = await categoryApi.getCategories();
+        const category = response.data.find((cat) => cat.id === categoryId);
+
+        if (category && category.subcategories) {
+            setSubcategories((prevSubcategories) => ({
+                ...prevSubcategories,
+                [categoryId]: category.subcategories.map((subCategory) => ({
+                    id: subCategory.id,
+                    name: subCategory.title,
+                    image: subCategory.imageUrl,
+                })),
+            }));
+        }
+    } catch (error) {
+        console.error("Error fetching subcategories:", error);
     }
-  };
+};
+
 
   const renderCategory = ({ item }) => (
     <CategoryItem
       item={item}
-      isSelected={item === selectedCategory}
+      isSelected={item.id === selectedCategory?.id}
       onPress={() => {
         setSelectedCategory(item);
-        toggleSubCategories(item.id);
+        fetchSubCategory(item.id);
       }}
     />
   );
-
+  
   const renderSubCategory = ({ item }) => (
     <SubCategoryItem
       item={item}
       onPress={() => {
-        navigation.navigate('SingleCategory', {
+        navigation.navigate("SingleCategory", {
           categoryId: selectedCategory.id,
           subCategoryId: item.id,
           categoryName: selectedCategory.name,
@@ -79,7 +95,7 @@ const CategoriesScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar
-        barStyle={Platform.OS === 'android' ? 'light-content' : 'dark-content'}
+        barStyle={Platform.OS === "android" ? "light-content" : "dark-content"}
       />
       <View style={styles.leftContainer}>
         {loading ? (
@@ -97,9 +113,10 @@ const CategoriesScreen = () => {
         {selectedCategory && (
           <View>
             <Image
-              source={{ uri: selectedCategory.image_Url }}
+              source={{ uri: selectedCategory.image }}
               style={styles.headerImage}
             />
+
             <Text style={styles.headerText}>{selectedCategory.title}</Text>
             {subcategories[selectedCategory.id] && (
               <FlatList
@@ -119,35 +136,35 @@ const CategoriesScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: colors.black,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingLeft: 8,
     paddingRight: 8,
-    marginTop: Platform.OS === 'ios' ? 40 : StatusBar.currentHeight,
+    marginTop: Platform.OS === "ios" ? 40 : StatusBar.currentHeight,
   },
   leftContainer: {
-    width: '25%',
+    width: "25%",
     backgroundColor: colors.danger,
     margin: 5,
     marginBottom: 5,
   },
   rightContainer: {
-    width: '75%',
+    width: "75%",
     backgroundColor: colors.bg,
     margin: 5,
     marginBottom: 5,
   },
   headerImage: {
-    width: '100%',
+    width: "100%",
     height: 120,
-    resizeMode: 'cover',
+    resizeMode: "cover",
   },
   headerText: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 16,
     marginBottom: 10,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });
 

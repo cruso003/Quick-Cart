@@ -16,8 +16,8 @@ import NewProduct from './components/New/NewProduct';
 import Products from './components/dataTable/productTable';
 import Categories from './components/dataTable/categoryTable';
 import NewCategory from './components/New/NewCategory';
-import NewSubcategory from './components/New/NewSubcategory';
 import NewBanner from './components/New/NewBanner';
+import NewSubcategory from './components/New/NewSubcategory';
 
 const Layout = () => {
   return (

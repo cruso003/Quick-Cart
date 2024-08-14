@@ -75,12 +75,6 @@ export const createSubcategory = async (req, res) => {
         return res.status(404).json({ error: "Subcategory not found" });
       }
   
-      // Delete the image from Cloudinary
-      if (subcategory.imageUrl) {
-        const publicId = subcategory.imageUrl.split("/").pop().split(".")[0];
-        await cloudinary.uploader.destroy(publicId);
-      }
-  
       // Delete the subcategory from the database
       await prisma.subcategory.delete({
         where: { id: subcategoryId },
@@ -88,7 +82,9 @@ export const createSubcategory = async (req, res) => {
   
       res.json({ message: "Subcategory deleted successfully" });
     } catch (error) {
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(500).json({
+        error: "Internal Server Error",
+        message: error.message, 
+      });
     }
   };
-  

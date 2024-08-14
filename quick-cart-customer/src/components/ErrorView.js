@@ -1,13 +1,14 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import SubmitButton from "./button/SubmitButton";
+import { Button } from "react-native-paper";
 
 
 function ErrorView({ message, onRetry }) {
   return (
     <View style={styles.errorContainer}>
       <Text style={styles.errorMessage}>{message}</Text>
-      <SubmitButton title="Retry" onPress={onRetry} />
+      <Button title="Retry" onPress={onRetry} /><Button/>
     </View>
   );
 }

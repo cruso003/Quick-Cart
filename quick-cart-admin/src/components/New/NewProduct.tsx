@@ -1,17 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import "./product.scss";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
-import { Key, useEffect, useState } from "react";
-import { categoryApiRequests, productApiRequests } from "../../api/api";
+import { useEffect, useState } from "react";
+import {
+  categoryApiRequests,
+  productApiRequests,
+  userApiRequest,
+} from "../../api/api";
 import { toast } from "react-toastify";
-import { useAuth } from "../../contexts/AuthContext";
 
 const NewProduct = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [subcategories, setSubcategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const { user } = useAuth();
+  const [sellers, setSellers] = useState<any[]>([]);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -26,6 +29,7 @@ const NewProduct = () => {
     condition: "",
     brand: "",
     images: [] as string[],
+    featured: false,
   });
 
   const fetchCategories = async () => {
@@ -59,16 +63,23 @@ const NewProduct = () => {
 
   useEffect(() => {
     fetchCategories();
+    fetchSellers();
   }, []);
 
-  useEffect(() => {
-    if (user) {
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        sellerId: user.storeId,
+  const fetchSellers = async () => {
+    try {
+      const response = await userApiRequest.getUsers({ role: "seller" });
+      const sellerData = response.data.data.map((seller: any) => ({
+        id: seller.storeId,
+        businessName: seller.businessName,
       }));
+
+      setSellers(sellerData);
+    } catch (error) {
+      console.error("Error fetching sellers:", error);
+      setSellers([]);
     }
-  }, [user]);
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newFiles = Array.from(e.target.files || []);
@@ -91,7 +102,6 @@ const NewProduct = () => {
 
       if (selectedCategory) {
         setSubcategories(selectedCategory.subcategories || []);
-
         setFormData({
           ...formData,
           category: selectedCategory.id,
@@ -106,6 +116,11 @@ const NewProduct = () => {
       setFormData({
         ...formData,
         subcategory: selectedSubcategory ? selectedSubcategory.id : "",
+      });
+    } else if (name === "sellerId") {
+      setFormData({
+        ...formData,
+        sellerId: value,
       });
     } else {
       setFormData({
@@ -208,6 +223,7 @@ const NewProduct = () => {
         condition: "",
         brand: "",
         images: [],
+        featured: false,
       });
 
       // Handle success
@@ -306,8 +322,8 @@ const NewProduct = () => {
                       onChange={handleChange}
                     >
                       <option value="">Select Subcategory</option>
-                      {subcategories.map((subcategory: any, index: Key) => (
-                        <option key={index} value={subcategory.title}>
+                      {subcategories.map((subcategory: any) => (
+                        <option key={subcategory.id} value={subcategory.title}>
                           {subcategory.title}
                         </option>
                       ))}
@@ -321,12 +337,7 @@ const NewProduct = () => {
                       type="number"
                       name="price"
                       value={formData.price}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          price: e.target.value,
-                        })
-                      }
+                      onChange={handleChange}
                     />
                   </div>
                   <div className="formColumn">
@@ -335,12 +346,7 @@ const NewProduct = () => {
                       type="number"
                       name="discount_price"
                       value={formData.discount_price}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          discount_price: e.target.value,
-                        })
-                      }
+                      onChange={handleChange}
                     />
                   </div>
                 </div>
@@ -351,103 +357,111 @@ const NewProduct = () => {
                       type="number"
                       name="stock"
                       value={formData.stock}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          stock: e.target.value,
-                        })
-                      }
+                      onChange={handleChange}
                     />
                   </div>
+                  <div className="formColumn">
+                    <label htmlFor="seller">Seller:</label>
+                    <select
+                      name="sellerId"
+                      value={formData.sellerId}
+                      onChange={handleChange}
+                    >
+                      <option value="">Select Seller</option>
+                      {sellers.map((seller) => (
+                        <option key={seller.id} value={seller.id}>
+                          {seller.businessName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="formRow">
                   <div className="formColumn">
                     <label htmlFor="condition">Condition:</label>
                     <input
                       type="text"
                       name="condition"
                       value={formData.condition}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          condition: e.target.value,
-                        })
-                      }
+                      onChange={handleChange}
                     />
                   </div>
-                </div>
-                <div className="formRow">
                   <div className="formColumn">
                     <label htmlFor="brand">Brand:</label>
                     <input
                       type="text"
                       name="brand"
                       value={formData.brand}
-                      onChange={(e) =>
-                        setFormData({ ...formData, brand: e.target.value })
-                      }
+                      onChange={handleChange}
                     />
                   </div>
                 </div>
                 <div className="formRow">
-                  <div className="formColumn">
-                    <label>Variations:</label>
-                    {formData.variations.map((variation, index) => (
-                      <div key={index}>
-                        <input
-                          type="text"
-                          placeholder="Variation Name"
-                          value={variation.name}
-                          onChange={(e) =>
-                            handleVariationChange(index, "name", e.target.value)
-                          }
-                        />
-                        <div>
-                          {variation.options.map((option: any, optionIndex: any) => (
-                            <div key={optionIndex}>
-                              <input
-                                type="text"
-                                placeholder="Option"
-                                value={option}
-                                onChange={(e) =>
-                                  handleVariationChange(
-                                    index,
-                                    "options",
-                                    variation.options.map((opt: any, i: Key | null | undefined) =>
-                                      i === optionIndex ? e.target.value : opt
-                                    )
-                                  )
-                                }
-                              />
-                              <button
-                                type="button"
-                                onClick={() => removeOption(index, optionIndex)}
-                              >
-                                Remove Option
-                              </button>
-                            </div>
-                          ))}
+                  <label>Variations:</label>
+                  {formData.variations.map((variation, index) => (
+                    <div key={index} className="variation">
+                      <input
+                        type="text"
+                        placeholder="Variation Name"
+                        value={variation.name}
+                        onChange={(e) =>
+                          handleVariationChange(index, "name", e.target.value)
+                        }
+                      />
+                      <input
+                        type="text"
+                        placeholder="Options (comma separated)"
+                        value={variation.options.join(", ")}
+                        onChange={(e) =>
+                          handleVariationChange(
+                            index,
+                            "options",
+                            e.target.value
+                          )
+                        }
+                      />
+                      <button type="button" onClick={() => addOption(index)}>
+                        Add Option
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeVariation(index)}
+                      >
+                        Remove Variation
+                      </button>
+                      {variation.options.map((optionIndex: any) => (
+                        <div key={optionIndex}>
                           <button
                             type="button"
-                            onClick={() => addOption(index)}
+                            onClick={() => removeOption(index, optionIndex)}
                           >
-                            Add Option
+                            Remove Option
                           </button>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => removeVariation(index)}
-                        >
-                          Remove Variation
-                        </button>
-                      </div>
-                    ))}
-
-                    <button type="button" onClick={addVariation}>
-                      Add Variation
-                    </button>
-                  </div>
+                      ))}
+                    </div>
+                  ))}
+                  <button type="button" onClick={addVariation}>
+                    Add Variation
+                  </button>
                 </div>
+                <div className="formRow">
+                  <label htmlFor="featured">Featured:</label>
+                  <label className="switch">
+                    <input
+                      type="checkbox"
+                      name="featured"
+                      checked={formData.featured}
+                      onChange={(e) =>
+                        setFormData({ ...formData, featured: e.target.checked })
+                      }
+                    />
+                    <span className="slider"></span>
+                  </label>
+                </div>
+
                 <button type="submit" disabled={loading}>
-                  {loading ? "Adding Product..." : "Add Product"}
+                  {loading ? "Adding..." : "Add Product"}
                 </button>
               </div>
             </form>
@@ -458,4 +472,4 @@ const NewProduct = () => {
   );
 };
 
-export default NewProduct
+export default NewProduct;

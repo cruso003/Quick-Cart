@@ -33,7 +33,7 @@ const productRoutes = {
 
 const categoryRoutes = {
     getCategories: "/categories",
-    createCategory: "/categorie/create",
+    createCategory: "/categories/create",
     deleteCategory: "/categories/:id",
 };
 

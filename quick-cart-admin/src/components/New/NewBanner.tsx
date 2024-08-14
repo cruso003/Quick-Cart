@@ -16,7 +16,7 @@ const NewBanner = () => {
   const [bannerData, setBannerData] = useState({
     name: "",
     linkedProducts: [] as string[],
-    image: null as File | null,
+    file: null as File | null,
   });
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
@@ -44,7 +44,7 @@ const NewBanner = () => {
 
     setBannerData((prevState) => ({
       ...prevState,
-      image: selectedFile,
+      file: selectedFile,
     }));
 
     setFile(selectedFile);
@@ -55,14 +55,13 @@ const NewBanner = () => {
     setLoading(true);
     const formData = new FormData();
     formData.append("name", bannerData.name);
-    if (bannerData.image) {
-      formData.append("image", bannerData.image);
+    if (bannerData.file) {
+      formData.append("file", bannerData.file);
     }
 
     // Append each selected product ID to the form data
-    bannerData.linkedProducts.forEach((productId) => {
-      formData.append("linkedProducts", productId);
-    });
+    formData.append("linkedProducts", JSON.stringify(bannerData.linkedProducts));
+
 
     try {
       await bannerApiRequests.uploadBanner(formData);
@@ -72,7 +71,7 @@ const NewBanner = () => {
       setBannerData({
         name: "",
         linkedProducts: [],
-        image: null,
+        file: null,
       });
       setFile(null);
 
@@ -127,6 +126,7 @@ const NewBanner = () => {
                     <input
                       type="text"
                       value={bannerData.name}
+                      placeholder="Banner Name"
                       onChange={(e) =>
                         setBannerData((prevState) => ({
                           ...prevState,

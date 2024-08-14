@@ -44,7 +44,12 @@
                     .formInput {
                         display: flex;
                         flex-direction: column;
-                        gap: 15px; // Adjusted gap for spacing
+                        gap: 15px;
+
+                        .icon {
+                            font-size: 28px;
+                            color: #000;
+                          }
                     }
 
                     .formRow {
@@ -60,7 +65,7 @@
                     input, select {
                         width: 100%;
                         padding: 10px; // Consistent padding
-                        border: 1px solid #ccc; // Light border color for inputs
+                        border: 1px solid #000000; // Light border color for inputs
                         border-radius: 4px;
                         font-size: 16px; // Larger font size for better readability
                     }

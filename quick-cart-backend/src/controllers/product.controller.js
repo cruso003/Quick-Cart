@@ -8,6 +8,7 @@ cloudinary.config({
   api_secret: process.env.API_SECRET,
 });
 
+
 // Create a new product
 export const createProduct = async (req, res) => {
   try {
@@ -26,8 +27,6 @@ export const createProduct = async (req, res) => {
       stock,
       totalSale,
     } = req.body;
-
-    console.log('Request Body:', req.body);
 
     // Handle variations
     if (typeof variations === 'string') {
@@ -98,51 +97,60 @@ export const createProduct = async (req, res) => {
     );
 
     // Create a new Product
-    const newProduct = await prisma.product.create({
-      data: {
-        name,
-        description,
-        price,
-        discountPrice: discount_price,
-        category: {
-          connect: { id: category },
-        },
-        subcategory: {
-          connect: { id: subcategory },
-        },
-        brand,
-        condition,
-        featured,
-        stock,
-        totalSale,
-        images: uploadedImages.map((img) => img.url),
-        store: {
-          connect: { id: store.id },
-        },
-        ...(variations?.length ? { variations: { create: variations } } : {}),
+    const productData = {
+      name,
+      description,
+      price,
+      discountPrice: discount_price,
+      category: {
+        connect: { id: category },
       },
+      subcategory: {
+        connect: { id: subcategory },
+      },
+      brand,
+      condition,
+      featured,
+      stock,
+      totalSale,
+      images: uploadedImages.map((img) => img.url),
+      store: {
+        connect: { id: store.id },
+      },
+    };
+
+    // Only add variations if provided
+    if (variations?.length) {
+      productData.variations = {
+        create: variations,
+      };
+    }
+
+    const newProduct = await prisma.product.create({
+      data: productData,
     });
 
     res.status(201).json(newProduct);
   } catch (error) {
-    console.error("Error creating product:", error);
     res.status(500).json({ error: error.message });
   }
 };
 
-
-// Get all products
+// Fetch products with their variations
 export const getProducts = async (req, res) => {
-    try {
-      const products = await prisma.product.findMany();
-  
-      res.json(products);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
-  };
-  
+  try {
+    const products = await prisma.product.findMany({
+      include: {
+        variations: true,
+      },
+    });
+
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
 // Search products
 export const searchProducts = async (req, res) => {
