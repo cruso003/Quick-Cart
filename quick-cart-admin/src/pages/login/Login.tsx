@@ -18,25 +18,19 @@ const Login: React.FC = () => {
     setLoading(true);
   
     try {
-      // Use the loginVendor function from apiRequests
+      // Use the loginAdmin function from apiRequests
       const response = await authApiRequests.loginAdmin(email, password);
       
+      
       const user = response.data;
+      
   
-      // Check if the account is approved
-      if (!user.isApproved) {
-        toast.error("Account Pending Verification. Wait for Verification Email.");
-         // Stop loading if the account is not approved
-        setLoading(false);
-        // Cancel login
-        return;
-      }
-  
-      if (user.role !== 'admin') {
+      if (user.role !== 'admin' && user.role !== 'super_admin') {
         toast.error("Not authorized");
         setLoading(false);
         return;
-      }
+    }
+    
   
       localStorage.setItem('user', JSON.stringify(user));
   
