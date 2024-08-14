@@ -14,6 +14,9 @@ import ForgotPassword from './pages/forgotPassword/ForgotPassword';
 import ResetPassword from './pages/resetpassword/ResetPassword';
 import NewProduct from './components/New/NewProduct';
 import Products from './components/dataTable/productTable';
+import Categories from './components/dataTable/categoryTable';
+import NewCategory from './components/New/NewCategory';
+import NewSubcategory from './components/New/NewSubcategory';
 import NewBanner from './components/New/NewBanner';
 
 const Layout = () => {
@@ -53,6 +56,18 @@ const router = createBrowserRouter([
       {
         path: "/products",
         element: <Products />,
+      },
+      {
+        path: "/categories",
+        element: <Categories />
+      },
+      {
+        path: "/categories/add-category",
+        element: <NewCategory />
+      },
+      {
+        path: "/subcategories/add-subcategory",
+        element: <NewSubcategory />
       },
       {
         path: "/banners/add-banner",
