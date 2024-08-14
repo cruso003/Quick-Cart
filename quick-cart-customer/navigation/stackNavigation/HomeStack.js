@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import BottomTab from "../tabBar/BottomTab";
 import { LoginScreen, RegisterScreen } from "../../src/screens/auth/index.js";
 import { ForgotPassword, VerifyOtp } from "../../src/screens/user/index";
+import SingleCategory from "../../src/screens/categories/SingleCategory.js";
 
 const Stack = createNativeStackNavigator();
 
@@ -23,6 +24,7 @@ export default function HomeStack() {
           name="Categories"
           component={BottomTab}
         />
+        <Stack.Screen name="SingleCategory" component={SingleCategory}/>
       </Stack.Group>
 
       {/* AccountStack */}

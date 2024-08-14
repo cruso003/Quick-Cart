@@ -23,14 +23,33 @@ export const menu = [
     listItems: [
       {
         id: 1,
+        title: "Users",
+        url: "/users",
+        icon: "user.svg",
+      },
+      {
+        id: 2,
         title: "Products",
         url: "/products",
         icon: "product.svg",
-      }
-
+      },
+      {
+        id: 3,
+        title: "Categories",
+        url: "/categories",
+        icon: "dashboard.svg",
+      },
+      {
+        id: 4,
+        title: "Transactions",
+        url: "/orders",
+        icon: "order.svg",
+      },
+      
     ],
   },
 ];
+
 export const singleProduct = {
   id: 1,
   title: "Playstation 5 Digital Edition",

@@ -1,22 +1,26 @@
 import { StyleSheet, Platform, StatusBar } from 'react-native';
-import colors from '../config/colors';
+import colors from '../../../theme/colors';
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#f6f6f6',
-    marginTop: Platform.OS === 'ios' ? 40 : StatusBar.currentHeight,
+    
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: '#fff',
+    backgroundColor: colors.danger,
     marginBottom: 10,
   },
   headerTitle: {
     fontSize: 18,
-    color: '#000',
-    paddingLeft: 15,
+    color: colors.white,
+    paddingLeft: 5,
+  },
+  headerContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   iconContainer: {
     justifyContent: 'center',
@@ -30,7 +34,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 5,
     top: 5,
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.primary,
     borderRadius: 9,
     justifyContent: 'center',
     alignItems: 'center',

@@ -14,6 +14,7 @@ import ForgotPassword from './pages/forgotPassword/ForgotPassword';
 import ResetPassword from './pages/resetpassword/ResetPassword';
 import NewProduct from './components/New/NewProduct';
 import Products from './components/dataTable/productTable';
+import NewBanner from './components/New/NewBanner';
 
 const Layout = () => {
   return (
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
         path: "/products",
         element: <Products />,
       },
+      {
+        path: "/banners/add-banner",
+        element: <NewBanner />
+      }
     ],
   },
   

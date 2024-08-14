@@ -1,79 +1,124 @@
 .new {
-  width: 100%;
-  display: flex;
-  background-color: rgb(72, 72, 72);
-  .newContainer {
-    flex: 6;
-
-    .top,
-    .bottom {
-      -webkit-box-shadow: 2px 4px 10px 1px rgba(0, 0, 0, 0.47);
-      box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
-      padding: 10px;
-      margin: 20px;
-      display: flex;
-
-      h1 {
-        color: lightgray;
-        font-size: 20px;
-      }
-
-      .left {
-        flex: 1;
-        text-align: center;
-
-        img {
-          width: 400px;
-          height: 300px;
-          border-radius: 10%;
-          object-fit: cover;
+    width: 100%;
+    display: flex;
+    background-color: #f0f0f0; // Light background color for better readability
+    padding: 20px;
+  
+    .newContainer {
+      flex: 6;
+      background-color: #ffffff; // White background for the form container
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden; // Prevents child elements from overflowing
+      padding: 20px;
+  
+      .top {
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e0e0e0;
+        
+        h1 {
+          color: #333333; // Darker text color for better contrast
+          font-size: 24px;
+          margin: 0;
         }
       }
-
-      .right {
-        flex: 2;
-
-        form {
-          display: flex;
-          flex-wrap: wrap;
-
-          .formInput {
+  
+      .bottom {
+        display: flex;
+        gap: 20px; // Space between image and form
+        padding: 20px 0;
+  
+        .left {
+          flex: 1;
+          text-align: center;
+  
+          img {
+            max-width: 100%; // Responsive image width
+            height: auto;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid #e0e0e0; // Light border for better definition
+          }
+        }
+  
+        .right {
+          flex: 2;
+          
+          form {
             display: flex;
             flex-direction: column;
-            gap: 30px;
-            justify-content: space-around;
+            gap: 20px; // Space between form elements
+            
+            .formInput {
+              display: flex;
+              flex-direction: column;
+              gap: 20px;
+              
+              label {
+                color: #000000; // Black color for form labels
+                font-weight: bold;
+                margin-bottom: 5px;
+                font-size: 16px;
+              }
+              
+              .icon {
+                margin-left: 10px;
+              }
+  
+              input[type="file"] {
+                display: none;
+              }
+  
+              input[type="text"] {
+                width: 100%; // Full width of the parent container
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                font-size: 14px;
+                margin-top: 5px;
+                color: #000000; // Black color for text
+                ::placeholder {
+                  color: #000000; // Black color for placeholder text
+                }
+              }
+  
+              button {
+                width: 100%;
+                padding: 10px;
+                border: none;
+                background-color: #ff0000; // Red button color
+                color: white;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+                border-radius: 4px;
+                transition: background-color 0.3s ease;
+  
+                &:hover {
+                  background-color: #cc0000; // Darker red for hover effect
+                }
+              }
+            }
           }
-
-          .formRow {
+  
+          .linkContainer {
             display: flex;
-            justify-content: space-between;
-            padding: 10px;
-          }
-
-          .formColumn {
-            width: 40%;
-          }
-
-          input {
-            width: 120%;
-            padding: 5px;
-            border: none;
-            border-bottom: 1px solid gray;
-            margin-top: 15px;
-          }
-
-          button {
-            width: 150px;
-            padding: 10px;
-            border: none;
-            background-color: #ff0000;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
+            gap: 30px; // Space between links
+            margin-top: 20px;
+            
+            .link {
+              font-size: 16px;
+              margin-left: 20px;
+              color: #ff0000;
+              text-decoration: none;
+              transition: color 0.3s ease;
+              &:hover {
+                color: #0056b3;
+              }
+            }
           }
         }
       }
     }
   }
-}

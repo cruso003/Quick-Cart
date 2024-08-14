@@ -195,3 +195,81 @@ export const approveSeller = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// Create an admin by super admin
+export const createAdmin = async (req, res) => {
+  const { name, email, password } = req.body;
+
+  try {
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Check if the user already exists
+    const userEmail = await prisma.user.findUnique({ where: { email } });
+    if (userEmail) {
+      return res.status(400).json({ success: false, message: "User already exists" });
+    }
+
+    // Create the admin
+    const newAdmin = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        role: "admin",
+      },
+    });
+
+    res.status(201).json({ message: "Admin account created successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Login an admin
+export const loginAdmin = async (req, res) => {
+  
+  const { email, password } = req.body;
+
+  try {
+    // Check if the admin user exists
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user || (user.role !== "admin" && user.role !== "super_admin"))
+      return res.status(401).json({ message: "Unauthorized!" });
+
+    // Check if the password is correct
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid)
+      return res.status(401).json({ message: "Invalid Credentials!" });
+
+    // Generate cookie token and send to the admin user
+    const age = 1000 * 60 * 60 * 24 * 7; // 7 days
+
+    const token = jwt.sign(
+      {
+        id: user.id,
+        role: user.role,
+      },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: age }
+    );
+
+    const { password: userPassword, ...userInfo } = user;
+
+    res
+      .cookie("token", token, {
+        httpOnly: true,
+        //secure:true
+        maxAge: age,
+      })
+      .status(200)
+      .json(userInfo);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Failed to login!" });
+  }
+};
