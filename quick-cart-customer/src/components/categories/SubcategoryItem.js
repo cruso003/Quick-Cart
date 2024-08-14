@@ -1,16 +1,19 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, ImageBackground, StyleSheet } from 'react-native';
 import defaultImage from '../../../assets/defaultCategory.png';
 
 const SubCategoryItem = ({ item, onPress }) => {
-  const imageSource = item.image_Url ? { uri: item.image_Url } : defaultImage;
-  const limitedName = item.title.length > 15 ? `${item.title.substr(0, 15)}...` : item.title;
+  const imageSource = item.image ? { uri: item.image } : defaultImage;
+  const limitedName = item.name.length > 15 ? `${item.name.substr(0, 15)}...` : item.name;
 
   return (
     <TouchableOpacity onPress={onPress}>
       <View style={styles.container}>
-        <Image source={imageSource} style={styles.image} />
-        <Text style={styles.text}>{limitedName}</Text>
+        <ImageBackground source={imageSource} style={styles.image} imageStyle={styles.imageStyle}>
+          <View style={styles.overlay}>
+            <Text style={styles.text}>{limitedName}</Text>
+          </View>
+        </ImageBackground>
       </View>
     </TouchableOpacity>
   );
@@ -20,19 +23,26 @@ const styles = StyleSheet.create({
   container: {
     marginLeft: 7,
     margin: 5,
-    backgroundColor: 'white',
     borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
+    overflow: 'hidden',
     width: 80,
     height: 80,
   },
   image: {
-    width: 30,
-    height: 30,
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  imageStyle: {
+    borderRadius: 10,
+  },
+  overlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    padding: 5,
   },
   text: {
-    marginLeft: 5,
+    color: 'white',
+    fontSize: 12,
+    textAlign: 'center',
   },
 });
 

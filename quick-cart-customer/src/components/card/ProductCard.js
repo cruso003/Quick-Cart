@@ -1,19 +1,18 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { AirbnbRating } from "react-native-ratings";
 import colors from "../../../theme/colors";
 import defaultImage from "../../../assets/defaultCategory.png";
+import ProductsApi from "../../../api/product/product";
+import { useFocusEffect } from "@react-navigation/native";
 
 function ProductCard({ item, navigateToProductDetails }) {
-  let imageSource = defaultImage;
-  if (item?.images && item?.images[0]) {
-    imageSource = { uri: item.images[0] };
-  }
+  const [vendorShopName, setVendorShopName] = useState("Quick-Store");
+
+  const imageSource = item?.images && item?.images[0] ? { uri: item.images[0] } : defaultImage;
 
   const regularPrice = item.price ? `$${item.price}` : null;
-  const discountPrice = item.discount_price
-    ? `$${item.discount_price}`
-    : null;
+  const discountPrice = item.discountPrice ? `$${item.discountPrice}` : null;
 
   const priceComponent = discountPrice ? (
     <View style={styles.pricesContainer}>
@@ -21,11 +20,9 @@ function ProductCard({ item, navigateToProductDetails }) {
         <Text style={styles.regularPrice}>{regularPrice}</Text>
         <Text style={styles.salePrice}>{discountPrice}</Text>
       </View>
-      {item.price && item.discount_price && (
+      {item.price && item.discountPrice && (
         <Text style={styles.discount}>
-          {(((item.price - item.discount_price) / item.price) * 100).toFixed(
-            0
-          ) + "% OFF"}
+          {(((item.price - item.discountPrice) / item.price) * 100).toFixed(0) + "% OFF"}
         </Text>
       )}
     </View>
@@ -33,10 +30,22 @@ function ProductCard({ item, navigateToProductDetails }) {
     <Text style={styles.productPrice}>{regularPrice}</Text>
   );
 
-  let vendorShopName = "Swift Store";
-  if (item.store) {
-    vendorShopName = item.store;
-  }
+  const fetchStoreName = async () => {
+    try {
+      if (item.storeId) {
+        const storeData = (await ProductsApi.getStoreById(item.storeId)).data;   
+        setVendorShopName(storeData.businessName || "Quick-Store");
+      }
+    } catch (error) {
+      console.error("Failed to fetch store name:", error);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchStoreName();
+    }, [item.storeId])
+  );
 
   return (
     <View style={styles.productContainer}>
@@ -49,25 +58,17 @@ function ProductCard({ item, navigateToProductDetails }) {
             <Text style={styles.productName} numberOfLines={1}>
               {item.name}
             </Text>
-
             <View style={{ alignSelf: "flex-start", marginLeft: 10 }}>
               <Text style={{ fontSize: 11, color: "#000", fontWeight: "bold" }}>
                 Sold By:{" "}
-                <Text
-                  style={{
-                    fontSize: 11,
-                    color: colors.black,
-                    fontWeight: "bold",
-                  }}
-                >
+                <Text style={{ fontSize: 11, color: colors.black, fontWeight: "bold" }}>
                   {vendorShopName}
                 </Text>
               </Text>
             </View>
-
             {priceComponent}
             <AirbnbRating
-              defaultRating={item.rating}
+              defaultRating={item.rating || 0}
               size={15}
               showRating={false}
             />
@@ -83,15 +84,15 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   productCard: {
-    width: 175,
-    height: 270,
+    width: 160,
+    height: 250,
     borderRadius: 16,
     backgroundColor: "white",
     marginLeft: 15,
   },
   productImage: {
     width: "100%",
-    height: 150,
+    height: 130,
     resizeMode: "cover",
     borderRadius: 16,
   },
@@ -121,7 +122,7 @@ const styles = StyleSheet.create({
     textDecorationLine: "line-through",
   },
   salePrice: {
-    fontSize: 22,
+    fontSize: 20,
     color: colors.primary,
     fontWeight: "bold",
   },
