@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { ScrollView, SafeAreaView, Platform, StatusBar, View, Text, TouchableOpacity } from "react-native";
-
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import userApi from "../../../api/user/user";
 import Header from "../../components/home/Header";

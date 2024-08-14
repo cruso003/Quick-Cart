@@ -69,8 +69,7 @@ const Categories: React.FC = () => {
   const fetchCategories = async () => {
     try {
       const response = await categoryApiRequests.getCategories();
-      console.log(response.data);
-      
+         
       const transformedData = response.data.map((category: any) => {
         const subcategoryData = category.subcategories.map((subcategory: any) => ({
           title: subcategory.title,

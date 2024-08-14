@@ -12,8 +12,9 @@ const NewCategory = () => {
   const [categoryData, setCategoryData] = useState({
     title: "",
     subTitle: "",
-    image: null as File | null,
-  });
+    file: null as File | null,
+  }); 
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCategoryData({
@@ -25,10 +26,11 @@ const NewCategory = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputElement = e.target as HTMLInputElement;
     const selectedFile = inputElement.files ? inputElement.files[0] : null;
+   
 
     setCategoryData({
       ...categoryData,
-      image: selectedFile,
+      file: selectedFile,
     });
 
     // Update the file state for displaying the selected image
@@ -36,12 +38,13 @@ const NewCategory = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    setLoading(true);
     e.preventDefault();
     const formData = new FormData();
     formData.append("title", categoryData.title);
     formData.append("subTitle", categoryData.subTitle);
-    if (categoryData.image) {
-      formData.append("image", categoryData.image);
+    if (categoryData.file) {
+      formData.append("file", categoryData.file);
     }
 
     try {
@@ -52,7 +55,7 @@ const NewCategory = () => {
       setCategoryData({
         title: "",
         subTitle: "",
-        image: null,
+        file: null,
       });
       // Clear the file state to remove the uploaded image
       setFile(null);
@@ -64,6 +67,8 @@ const NewCategory = () => {
     } catch (error: any) {
       console.error("Error adding category:", error);
       toast.error(error.response?.data?.message || "An error occurred");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -122,7 +127,7 @@ const NewCategory = () => {
                     />
                   </div>
                 </div>
-                <button type="submit">Add Category</button>
+                <button type="submit" disabled={loading}>{loading ? "Uploading..." : "Add Category"}</button>
               </div>
             </form>
             <div className="linkContainer">

@@ -1,132 +1,176 @@
 .product {
-    display: flex;
-    justify-content: center;
-    background-color: #f0f0f0;
-    padding: 20px;
-    min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  background-color: #f0f0f0;
+  padding: 20px;
+  min-height: 100vh;
 
-    .productContainer {
-        background-color: #ffffff;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        width: 100%;
-        max-width: 1200px; // Max width to prevent it from stretching too wide
+  .productContainer {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    width: 100%;
+    max-width: 1200px; // Max width to prevent it from stretching too wide
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+
+    .top {
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e0e0e0;
+
+      h1 {
+        color: #333333;
+        font-size: 24px;
+        margin: 0;
+      }
+    }
+
+    .bottom {
+      display: flex;
+      gap: 20px;
+
+      .left {
+        flex: 1;
         display: flex;
         flex-direction: column;
-        padding: 20px;
+        align-items: center;
+        justify-content: center;
 
-        .top {
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e0e0e0;
-
-            h1 {
-                color: #333333;
-                font-size: 24px;
-                margin: 0;
-            }
+        img {
+          max-width: 100%;
+          height: auto;
+          border-radius: 8px;
+          border: 1px solid #e0e0e0;
+          margin-bottom: 10px;
         }
+      }
 
-        .bottom {
+      .right {
+        flex: 2;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+
+        form {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+
+          .formInput {
             display: flex;
-            gap: 20px;
+            flex-direction: column;
+            gap: 15px;
 
-            .left {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-
-                img {
-                    max-width: 100%;
-                    height: auto;
-                    border-radius: 8px;
-                    border: 1px solid #e0e0e0;
-                    margin-bottom: 10px;
-                }
+            label {
+              color: #000000;
+              font-weight: bold;
+              font-size: 16px;
+              margin-bottom: 5px;
             }
 
-            .right {
-                flex: 2;
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
-
-                form {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 20px;
-
-                    .formInput {
-                        display: flex;
-                        flex-direction: column;
-                        gap: 15px;
-
-                        label {
-                            color: #000000;
-                            font-weight: bold;
-                            font-size: 16px;
-                            margin-bottom: 5px;
-                        }
-
-                        input[type="file"] {
-                            display: none;
-                        }
-
-                        input,
-                        textarea {
-                            width: 100%;
-                            padding: 10px;
-                            border: 1px solid #ccc;
-                            border-radius: 4px;
-                            font-size: 14px;
-                            color: #000000;
-
-                            &::placeholder {
-                                color: #888888; // Light color for placeholder
-                            }
-                        }
-
-                        textarea {
-                            resize: vertical; // Allow vertical resizing only
-                            min-height: 100px;
-                        }
-
-                        select {
-                            width: 100%;
-                            padding: 10px;
-                            border: 1px solid #ccc;
-                            border-radius: 4px;
-                            font-size: 14px;
-                            color: #000000;
-                        }
-
-                        .icon {
-                            margin-left: 10px;
-                        }
-
-                        button {
-                            width: 100%;
-                            padding: 10px;
-                            border: none;
-                            background-color: #ff0000;
-                            color: white;
-                            font-size: 16px;
-                            font-weight: bold;
-                            cursor: pointer;
-                            border-radius: 4px;
-                            transition: background-color 0.3s ease;
-
-                            &:hover {
-                                background-color: #cc0000;
-                            }
-                        }
-
-                    }
-                }
+            input[type="file"] {
+              display: none;
             }
+
+            input,
+            textarea {
+              width: 100%;
+              padding: 10px;
+              border: 1px solid #ccc;
+              border-radius: 4px;
+              font-size: 14px;
+              color: #000000;
+
+              &::placeholder {
+                color: #888888; // Light color for placeholder
+              }
+            }
+
+            textarea {
+              resize: vertical; // Allow vertical resizing only
+              min-height: 100px;
+            }
+
+            select {
+              width: 100%;
+              padding: 10px;
+              border: 1px solid #ccc;
+              border-radius: 4px;
+              font-size: 14px;
+              color: #000000;
+            }
+
+            .icon {
+              margin-left: 10px;
+            }
+            /* Custom switch (round checkbox) */
+            .switch {
+              position: relative;
+              display: inline-block;
+              width: 34px;
+              height: 20px;
+            }
+
+            .switch input {
+              opacity: 0;
+              width: 0;
+              height: 0;
+            }
+
+            .slider {
+              position: absolute;
+              cursor: pointer;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background-color: #ccc;
+              transition: 0.4s;
+              border-radius: 34px;
+            }
+
+            .slider:before {
+              position: absolute;
+              content: "";
+              height: 14px;
+              width: 14px;
+              left: 3px;
+              bottom: 3px;
+              background-color: white;
+              transition: 0.4s;
+              border-radius: 50%;
+            }
+
+            input:checked + .slider {
+              background-color: #ff0000;
+            }
+
+            input:checked + .slider:before {
+              transform: translateX(14px);
+            }
+
+            button {
+              width: 100%;
+              padding: 10px;
+              border: none;
+              background-color: #ff0000;
+              color: white;
+              font-size: 16px;
+              font-weight: bold;
+              cursor: pointer;
+              border-radius: 4px;
+              transition: background-color 0.3s ease;
+
+              &:hover {
+                background-color: #cc0000;
+              }
+            }
+          }
         }
+      }
     }
+  }
 }

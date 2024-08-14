@@ -54,34 +54,48 @@ export const createCategory = async (req, res) => {
     }
   };
   
-  //Delete Category by its ID
-  export const deleteCategory = async (req, res) => {
-    const categoryId = req.params.id;
-  
-    try {
-      // Get the category by ID
-      const category = await prisma.category.findUnique({
-        where: { id: categoryId },
-      });
-  
-      if (!category) {
-        return res.status(404).json({ error: "Category not found" });
-      }
-  
-      // Delete the image from Cloudinary
-      if (category.imageUrl) {
-        const publicId = category.imageUrl.split("/").pop().split(".")[0];
-        await cloudinary.uploader.destroy(publicId);
-      }
-  
-      // Delete the category from the database
-      await prisma.category.delete({
-        where: { id: categoryId },
-      });
-  
-      res.json({ message: "Category deleted successfully" });
-    } catch (error) {
-      res.status(500).json({ error: "Internal Server Error" });
+// Delete Category by its ID
+export const deleteCategory = async (req, res) => {
+  const categoryId = req.params.id;
+
+  try {
+    // Get the category by ID
+    const category = await prisma.category.findUnique({
+      where: { id: categoryId },
+    });
+
+    if (!category) {
+      return res.status(404).json({ error: "Category not found" });
     }
-  };
-  
+
+    // Find all products associated with this category
+    const products = await prisma.product.findMany({
+      where: { categoryId: categoryId },
+    });
+
+    // Get all product IDs
+    const productIds = products.map(product => product.id);
+
+    // Delete all variations associated with these products
+    await prisma.variation.deleteMany({
+      where: { productId: { in: productIds } },
+    });
+
+    // Delete all products associated with this category
+    await prisma.product.deleteMany({
+      where: { categoryId: categoryId },
+    });
+
+    // Delete the category from the database
+    await prisma.category.delete({
+      where: { id: categoryId },
+    });
+
+    res.json({ message: "Category deleted successfully" });
+  } catch (error) {
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: error.message,
+    });
+  }
+};

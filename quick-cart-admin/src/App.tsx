@@ -17,7 +17,7 @@ import Products from './components/dataTable/productTable';
 import Categories from './components/dataTable/categoryTable';
 import NewCategory from './components/New/NewCategory';
 import NewBanner from './components/New/NewBanner';
-import NewSubcategory from './components/New/NewSubCategory';
+import NewSubcategory from './components/New/NewSubcategory';
 
 const Layout = () => {
   return (

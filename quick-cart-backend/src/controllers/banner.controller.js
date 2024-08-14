@@ -1,30 +1,35 @@
-import { v2 as cloudinary } from 'cloudinary'
-import prisma from '../../lib/prisma.js';
+import { v2 as cloudinary } from "cloudinary";
+import prisma from "../../lib/prisma.js";
 
 // Configure Cloudinary
 cloudinary.config({
-    cloud_name: process.env.CLOUD_NAME,
-    api_key: process.env.API_KEY,
-    api_secret: process.env.API_SECRET,
-  });
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
 
 export const uploadBanner = async (req, res) => {
   try {
     const { name, linkedProducts } = req.body;
-    const file = req.file;
 
+    // Ensure linkedProducts is an array
+    const linkedProductsArray = Array.isArray(linkedProducts) ? linkedProducts : [];
+    console.log("linkedProductsArray:", linkedProductsArray);
+    
+    const file = req.file;
+    
     // Upload image to Cloudinary
     const cloudinaryUpload = await cloudinary.uploader.upload(file.path, {
       folder: "banner_images",
     });
-
+    
     // Create a new banner
     const banner = await prisma.banner.create({
       data: {
         name,
         imageUrl: cloudinaryUpload.secure_url,
         linkedProducts: {
-          create: linkedProducts.map((productId) => ({
+          create: linkedProductsArray.map((productId) => ({
             product: {
               connect: { id: productId },
             },
@@ -32,6 +37,9 @@ export const uploadBanner = async (req, res) => {
         },
       },
     });
+    
+    res.status(201).json(banner);
+    
 
     res.status(201).json(banner);
   } catch (error) {
