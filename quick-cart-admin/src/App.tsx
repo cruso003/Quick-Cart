@@ -14,13 +14,7 @@ import ForgotPassword from './pages/forgotPassword/ForgotPassword';
 import ResetPassword from './pages/resetpassword/ResetPassword';
 import NewProduct from './components/New/NewProduct';
 import Products from './components/dataTable/productTable';
-<<<<<<< HEAD
 import NewBanner from './components/New/NewBanner';
-=======
-import Categories from './components/dataTable/categoryTable';
-import NewCategory from './components/New/NewCategory';
-import NewSubcategory from './components/New/NewSubCategory';
->>>>>>> 22b1e82 (Added the category data table, implemented the new category and subcategory)
 
 const Layout = () => {
   return (
@@ -61,23 +55,9 @@ const router = createBrowserRouter([
         element: <Products />,
       },
       {
-<<<<<<< HEAD
         path: "/banners/add-banner",
         element: <NewBanner />
       }
-=======
-        path: "/categories",
-        element: <Categories />
-      },
-      {
-        path: "/categories/add-category",
-        element: <NewCategory />
-      },
-      {
-        path: "/subcategories/add-subcategory",
-        element: <NewSubcategory />
-      },
->>>>>>> 22b1e82 (Added the category data table, implemented the new category and subcategory)
     ],
   },
   
