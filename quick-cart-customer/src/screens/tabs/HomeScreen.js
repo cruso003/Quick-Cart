@@ -1,12 +1,11 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { ScrollView, SafeAreaView, Platform, StatusBar, View, Text, TouchableOpacity } from "react-native";
-
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import userApi from "../../../api/user/user";
 import Header from "../../components/home/Header";
 import AddressBar from "../../components/home/AddressBar";
 import LocationModal from "../../components/home/LocationModal";
-import { useDeliveryAddress } from "../../context/DeliveryAddress";
+import { useDeliveryAddress } from "../../../context/DeliveryAddress";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Categories from "../../components/categories/Categories";
 import Banners from "../../components/home/Banners";

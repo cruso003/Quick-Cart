@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { NavigationContainer } from '@react-navigation/native';
 import HomeStack from "./navigation/stackNavigation/HomeStack";
-import { DeliveryAddressProvider } from "./src/context/DeliveryAddress";
+import { DeliveryAddressProvider } from "./context/DeliveryAddress";
 
 export default function App() {
   const [initializing, setInitializing] = useState(true);
