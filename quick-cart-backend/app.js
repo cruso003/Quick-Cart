@@ -11,6 +11,7 @@ import subcategoryRoute from "./src/routes/subcategory.route.js";
 import { approveSeller } from './src/controllers/auth.controller.js';
 import bannerRoute from "./src/routes/banner.route.js";
 import cartRoute from "./src/routes/cart.route.js";
+import orderRoute from "./src/routes/order.route.js";
 
 // Initialize Express
 const app = express();
@@ -36,6 +37,7 @@ app.get('/api/v1/approve-seller/:token', approveSeller
 );
 app.use('/api/v1/banners', bannerRoute);
 app.use('/api/v1/cart', cartRoute);
+app.use('/api/v1/orders', orderRoute);
 
 // Start the server
 const PORT = process.env.PORT

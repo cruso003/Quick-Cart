@@ -32,6 +32,10 @@ model User {
   store Store? @relation("UserStore")
 
   Cart Cart[]
+
+  Order Order[]
+
+  Wallet Wallet[]
 }
 
 model Address {
@@ -61,6 +65,8 @@ model Store {
   products     Product[]
 
   owner User @relation("UserStore", fields: [ownerId], references: [id])
+
+  OrderProduct OrderProduct[]
 }
 
 model Product {
@@ -88,6 +94,8 @@ model Product {
   banners     BannerOnProduct[]
 
   CartItem CartItem[]
+
+  OrderProduct OrderProduct[]
 }
 
 model Variation {
@@ -97,6 +105,8 @@ model Variation {
   productId String   @db.ObjectId
 
   product Product @relation(fields: [productId], references: [id])
+
+  VariationSelection VariationSelection[]
 }
 
 model Banner {
@@ -156,21 +166,65 @@ model Cart {
 
 model CartItem {
   id                  String             @id @default(auto()) @map("_id") @db.ObjectId
-  productId           String             @db.ObjectId
   product             Product            @relation(fields: [productId], references: [id])
+  productId           String             @db.ObjectId
+  variationSelections VariationSelection[]
   cartId              String             @db.ObjectId
   cart                Cart               @relation(fields: [cartId], references: [id])
-  qty                 Int                @default(1)
-  checked             Boolean            @default(true)
-  salePrice           Float
-  selectedVariations  Json?
-  shipmentOption      String?
-  deliveryFee         Float?
-  selectedCity        String?
-  selectedState       String?
-  selectedPickupStation Json?
-  selectedAddress     Json?
+  quantity            Int
+}
 
-  @@index([productId])
-  @@index([cartId])
+model VariationSelection {
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  variation        Variation @relation(fields: [variationId], references: [id])
+  variationId      String    @db.ObjectId
+  selectedOption   String
+  cartItemId       String    @db.ObjectId
+  cartItem         CartItem  @relation(fields: [cartItemId], references: [id])
+}
+
+model Order {
+  id             String         @id @default(auto()) @map("_id") @db.ObjectId
+  products       OrderProduct[]
+  userId         String         @db.ObjectId
+  user           User           @relation(fields: [userId], references: [id])
+  status         String         @default("Pending")
+  trackingNumber String?
+  orderDate      DateTime       @default(now())
+  paymentId      String?        @db.ObjectId @unique
+
+  payment        OrderPayment?  @relation("OrderPayment")
+}
+
+model OrderPayment {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  orderId       String  @db.ObjectId @unique
+  order         Order?  @relation("OrderPayment", fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  amount        Float
+  transactionId String  @default(uuid())
+}
+
+model OrderProduct {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId String   @db.ObjectId
+  orderId   String   @db.ObjectId
+  storeId   String   @db.ObjectId
+  quantity  Int
+  product   Product  @relation(fields: [productId], references: [id])
+  order     Order    @relation(fields: [orderId], references: [id])
+  store     Store    @relation(fields: [storeId], references: [id])
+}
+
+model Wallet {
+  id      String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId  String  @db.ObjectId @unique
+  user    User    @relation(fields: [userId], references: [id])
+  balance Float   @default(0.0)
+}
+
+model PaymentMethod {
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  method       String  @unique
+  displayName  String
+  provider     String
 }
