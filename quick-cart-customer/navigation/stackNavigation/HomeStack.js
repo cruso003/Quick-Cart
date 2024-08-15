@@ -4,6 +4,7 @@ import BottomTab from "../tabBar/BottomTab";
 import { LoginScreen, RegisterScreen } from "../../src/screens/auth/index.js";
 import { ForgotPassword, VerifyOtp } from "../../src/screens/user/index";
 import SingleCategory from "../../src/screens/categories/SingleCategory.js";
+import BannerProducts from "../../src/screens/products/BannerProduct.js";
 
 const Stack = createNativeStackNavigator();
 
@@ -16,6 +17,7 @@ export default function HomeStack() {
           name="HomeScreen"
           component={BottomTab}
         />
+        <Stack.Screen name="BannerProduct" component={BannerProducts} />.
       </Stack.Group>
 
       {/* CategoryStack */}
