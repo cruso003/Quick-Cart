@@ -13,6 +13,7 @@ import bannerRoute from "./src/routes/banner.route.js";
 import cartRoute from "./src/routes/cart.route.js";
 import orderRoute from "./src/routes/order.route.js";
 import walletRoute from "./src/routes/wallet.route.js";
+import pickupstationRoute from "./src/routes/pickupstation.route.js";
 
 // Initialize Express
 const app = express();
@@ -40,6 +41,7 @@ app.use('/api/v1/banners', bannerRoute);
 app.use('/api/v1/cart', cartRoute);
 app.use('/api/v1/orders', orderRoute);
 app.use('/api/v1/wallet', walletRoute);
+app.use('/api/v1/pickupstation', pickupstationRoute);
 
 // Start the server
 const PORT = process.env.PORT
