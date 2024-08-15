@@ -10,12 +10,12 @@ function Header({ title, cartLength, onBack, onCart, onShare, onMore }) {
         style={[styles.centerElement, { width: 50, height: 50 }]}
         onPress={onBack}
       >
-        <MaterialIcons name="arrow-back" size={25} color="#000" />
+        <MaterialIcons name="arrow-back" size={25} color={colors.white}/>
       </TouchableOpacity>
       <View style={{ flexGrow: 1, flexShrink: 1, alignSelf: "center" }}>
         <Text
           numberOfLines={1}
-          style={{ fontSize: 20, color: "black", fontWeight: "bold" }}
+          style={{ fontSize: 20, color: colors.white, fontWeight: "bold" }}
         >
           {title}
         </Text>
@@ -64,7 +64,7 @@ function Header({ title, cartLength, onBack, onCart, onShare, onMore }) {
 const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
-    backgroundColor: "grey",
+    backgroundColor: colors.danger,
   },
   centerElement: { justifyContent: "center", alignItems: "center" },
 });

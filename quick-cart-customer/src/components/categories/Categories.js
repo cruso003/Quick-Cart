@@ -55,7 +55,7 @@ const Categories = () => {
             <View style={styles.categoryContainer}>
               <TouchableNativeFeedback
                 onPress={() => {
-                  navigation.navigate("CategorySingle", {
+                  navigation.navigate("SingleCategory", {
                     categoryName: item.name,
                   });
                 }}
