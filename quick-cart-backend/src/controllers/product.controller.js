@@ -136,7 +136,7 @@ export const createProduct = async (req, res) => {
   }
 };
 
-// Fetch products with their variations, category name, and subcategory name
+// Fetch products and include relevant dat
 export const getProducts = async (req, res) => {
   try {
     const products = await prisma.product.findMany({
@@ -152,21 +152,51 @@ export const getProducts = async (req, res) => {
             title: true,
           },
         },
+        store: {
+          select: {
+            name: true,
+            businessName: true,
+            phoneNumber: true,
+            email: true,
+            address: true,
+            city: true,
+            state: true,
+          },
+        },
+        ratings: true,
       },
     });
 
-    // Map the response to include category and subcategory names
-    const formattedProducts = products.map((product) => ({
-      ...product,
-      categoryName: product.category?.title,
-      subcategoryName: product.subcategory?.title,
-    }));
+    // Map the response to include category, subcategory names, and average rating
+    const formattedProducts = products.map((product) => {
+      const averageRating =
+        product.ratings.length > 0
+          ? product.ratings.reduce((sum, rating) => sum + rating.rating, 0) / product.ratings.length
+          : null;
+
+      return {
+        ...product,
+        categoryName: product.category?.title,
+        subcategoryName: product.subcategory?.title,
+        averageRating, // Include the average rating
+        store: {
+          name: product.store?.name,
+          businessName: product.store?.businessName,
+          phoneNumber: product.store?.phoneNumber,
+          email: product.store?.email,
+          address: product.store?.address,
+          city: product.store?.city,
+          state: product.store?.state,
+        },
+      };
+    });
 
     res.status(200).json(formattedProducts);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 
