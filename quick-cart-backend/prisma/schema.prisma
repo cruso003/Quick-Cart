@@ -36,7 +36,11 @@ model User {
   Order Order[]
 
   Wallet Wallet[]
+
+  sentMessages      Message[] @relation("Sender")
+  receivedMessages  Message[] @relation("Receiver")
 }
+
 
 model PickupStation {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -236,4 +240,20 @@ model PaymentMethod {
   method       String  @unique
   displayName  String
   provider     String
+}
+
+model Message {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  content    String
+  senderId   String   @db.ObjectId
+  receiverId String   @db.ObjectId
+  sentAt     DateTime @default(now())
+  isRead     Boolean  @default(false)
+
+  sender     User     @relation("Sender", fields: [senderId], references: [id])
+  receiver   User     @relation("Receiver", fields: [receiverId], references: [id])
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([sentAt])
 }
