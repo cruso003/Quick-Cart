@@ -11,6 +11,8 @@ cloudinary.config({
 export const uploadBanner = async (req, res) => {
   try {
     const { name, linkedProducts } = req.body;
+    console.log(req.body);
+    
 
     // Ensure linkedProducts is an array
     const linkedProductsArray = Array.isArray(linkedProducts) ? linkedProducts : [];

@@ -10,6 +10,7 @@ import categoryRoute from "./src/routes/category.route.js";
 import subcategoryRoute from "./src/routes/subcategory.route.js";
 import { approveSeller } from './src/controllers/auth.controller.js';
 import bannerRoute from "./src/routes/banner.route.js";
+import cartRoute from "./src/routes/cart.route.js";
 
 // Initialize Express
 const app = express();
@@ -34,6 +35,7 @@ app.use('/api/v1/products', productRoute);
 app.get('/api/v1/approve-seller/:token', approveSeller
 );
 app.use('/api/v1/banners', bannerRoute);
+app.use('/api/v1/cart', cartRoute);
 
 // Start the server
 const PORT = process.env.PORT

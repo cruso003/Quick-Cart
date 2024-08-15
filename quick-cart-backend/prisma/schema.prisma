@@ -30,6 +30,8 @@ model User {
   approvalToken       String?
 
   store Store? @relation("UserStore")
+
+  Cart Cart[]
 }
 
 model Address {
@@ -84,6 +86,8 @@ model Product {
   subcategory Subcategory       @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
   store       Store             @relation(fields: [storeId], references: [id])
   banners     BannerOnProduct[]
+
+  CartItem CartItem[]
 }
 
 model Variation {
@@ -139,4 +143,34 @@ model Subcategory {
   categoryId String    @db.ObjectId
   category   Category  @relation("CategorySubcategories", fields: [categoryId], references: [id], onDelete: Cascade)
   products   Product[]
+}
+
+model Cart {
+  id     String  @id @default(auto()) @map("_id") @db.ObjectId
+  user   User    @relation(fields: [userId], references: [id])
+  userId String  @db.ObjectId
+  items  CartItem[]
+
+  @@index([userId])
+}
+
+model CartItem {
+  id                  String             @id @default(auto()) @map("_id") @db.ObjectId
+  productId           String             @db.ObjectId
+  product             Product            @relation(fields: [productId], references: [id])
+  cartId              String             @db.ObjectId
+  cart                Cart               @relation(fields: [cartId], references: [id])
+  qty                 Int                @default(1)
+  checked             Boolean            @default(true)
+  salePrice           Float
+  selectedVariations  Json?
+  shipmentOption      String?
+  deliveryFee         Float?
+  selectedCity        String?
+  selectedState       String?
+  selectedPickupStation Json?
+  selectedAddress     Json?
+
+  @@index([productId])
+  @@index([cartId])
 }

@@ -136,20 +136,38 @@ export const createProduct = async (req, res) => {
   }
 };
 
-// Fetch products with their variations
+// Fetch products with their variations, category name, and subcategory name
 export const getProducts = async (req, res) => {
   try {
     const products = await prisma.product.findMany({
       include: {
         variations: true,
+        category: {
+          select: {
+            title: true,
+          },
+        },
+        subcategory: {
+          select: {
+            title: true,
+          },
+        },
       },
     });
 
-    res.status(200).json(products);
+    // Map the response to include category and subcategory names
+    const formattedProducts = products.map((product) => ({
+      ...product,
+      categoryName: product.category?.title,
+      subcategoryName: product.subcategory?.title,
+    }));
+
+    res.status(200).json(formattedProducts);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 // Search products
