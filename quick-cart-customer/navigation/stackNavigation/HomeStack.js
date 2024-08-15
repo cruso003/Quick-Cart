@@ -1,5 +1,4 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-
 import BottomTab from "../tabBar/BottomTab";
 import { LoginScreen, RegisterScreen } from "../../src/screens/auth/index.js";
 import { ForgotPassword, VerifyOtp } from "../../src/screens/user/index";
@@ -17,7 +16,7 @@ export default function HomeStack() {
           name="HomeScreen"
           component={BottomTab}
         />
-        <Stack.Screen name="BannerProduct" component={BannerProducts} />.
+        <Stack.Screen name="BannerProduct" component={BannerProducts} />
       </Stack.Group>
 
       {/* CategoryStack */}
