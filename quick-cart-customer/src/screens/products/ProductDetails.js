@@ -1,45 +1,20 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  Platform,
-  StatusBar,
-  ScrollView,
-  SafeAreaView,
-  Alert,
-  Modal,
-  FlatList,
-  ActivityIndicator,
-} from "react-native";
-import {
-  MaterialIcons,
-  Ionicons,
-  FontAwesome5,
-  AntDesign,
-  FontAwesome6,
-  MaterialCommunityIcons,
-  Entypo,
-} from "@expo/vector-icons";
+import { View, Text, TouchableOpacity, Platform, StatusBar, ScrollView, SafeAreaView, } from "react-native";
+import {Ionicons,FontAwesome5} from "@expo/vector-icons";
 import colors from "../../../theme/colors";
-import { AirbnbRating } from "react-native-ratings";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import Swiper from "react-native-swiper";
 import { useWishlist } from "../../../context/wishlist";
 import { useCart } from "../../../context/cart";
-import { RadioButton } from "react-native-paper";
 import { format } from "date-fns";
 import { useAuth } from "../../../context/auth";
 import messageApi from "../../../api/message/message";
-import storeApi from "../../../api/store/store";
 import usersApi from "../../../api/user/user";
 import shipmentApi from "../../../api/shipment/shipment";
 import { useDeliveryAddress } from "../../../context/DeliveryAddress";
-import LocationModal from "../../components//home/LocationModal";
-import { Picker } from "@react-native-picker/picker";
 import Header from "../../components/Header";
 import styles from "./styles";
+import { CustomerReviews, DeliveryAndReturns, ImageSlider, PriceRating,WishlistButton, ProductInfo, VendorInfo, DetailsSection } from "../../components/product-details/index.js";
+import { addProductToCart, addProductToWishlist, maskUserName } from "../../utils/utils";
 
 const ProductDetails = () => {
   const navigation = useNavigation();
@@ -65,35 +40,18 @@ const ProductDetails = () => {
   const [buyer, setBuyer] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const maskUserName = (userName) => {
-    if (userName.length < 3) return userName;
-    const firstChar = userName.charAt(0);
-    const lastChar = userName.charAt(userName.length - 1);
-    return `${firstChar}***${lastChar}`;
-  };
 
   const fetchSender = async () => {
     if (user && user.user && user.user.id) {
       const userId = user.user.id;
-      try {
-        const response = await usersApi.getUserById(userId);
+      try {    
+        const response = await usersApi.getUserById(userId);       
         setBuyer(response.data.data);
       } catch (error) {
         console.error("Error fetching user:", error);
       }
-    }
-  };
-  const fetchStore = async () => {
-    const { product } = route.params;
-    const storeName = product.store;
-    try {
-      const response = await storeApi.getStoreByName(storeName);
-      setSeller(response.data);
-    } catch (error) {
-      console.error("Error fetching store:", error);
     }
   };
 
@@ -105,7 +63,6 @@ const ProductDetails = () => {
       setPickupStations(stations);
 
       // Set filtered stations based on the selected state and city
-      // Assuming `selectedState` and `selectedCity` are defined elsewhere
       const filteredStations = stations.filter((station) =>
         selectedState
           ? station.address.state === selectedState &&
@@ -181,11 +138,7 @@ const ProductDetails = () => {
     try {
       // Ensure product, product.store, and product.images are defined
       if (
-        product &&
-        product.store &&
-        product.images &&
-        product.images.length > 0
-      ) {
+        product && product.store && product.images && product.images.length > 0) {
         // Check if a user is logged in
         if (user && user.user && user.user.id) {
           const messageData = {
@@ -209,8 +162,6 @@ const ProductDetails = () => {
           } else {
             console.error("Invalid response from server");
           }
-
-          // Add any additional logic you want to perform after sending the message
         } else {
           // Navigate to the login page if no user is logged in
           navigation.navigate("Login", {
@@ -328,7 +279,6 @@ const ProductDetails = () => {
         }
       }
     }
-    fetchStore();
     fetchSender();
 
     if (shipmentOption === "Pickup Station") {
@@ -360,89 +310,21 @@ const ProductDetails = () => {
     return null;
   }
 
-  // Function to toggle modal visibility
-  const toggleModal = () => {
-    setModalVisible(!modalVisible);
-  };
 
-  const addProductToCart = async () => {
-    const userId = user && user.user ? user.user._id : null;
-    // Check if the delivery method is chosen
-    if (!shipmentOption) {
-      Alert.alert("Please choose a delivery method.");
-      return;
-    }
-
-    // Check if variations are chosen
-    const allVariationsChosen = product.variations.every(
-      (variation) => selectedVariations[variation.name] !== undefined
-    );
-
-    if (!allVariationsChosen) {
-      Alert.alert("Please choose all variations.");
-      return;
-    }
-    const productId = product.id;
-    // Create the cart item
-    const cartItem = {
-      user: userId ? userId : null,
-      product: productId,
-      salePrice: product.discount_price
-        ? product.discount_price
-        : product.price,
-      selectedVariations,
-      shipmentOption,
-      deliveryFee,
-      selectedPickupStation,
-      selectedAddress,
-    };
-
-    Alert.alert(
-      "Product added to cart, do you want to proceed to the cart?",
-      "",
-      [
-        {
-          text: "No, keep shopping",
-          onPress: () => navigation.goBack(),
-          style: "cancel",
-        },
-        {
-          text: "Yes",
-          onPress: async () => {
-            navigation.navigate("Cart");
-          },
-        },
-      ],
-      { cancelable: false }
-    );
-    addToCart(cartItem);
-    setIsInCart(true);
-  };
-
-  const addProductToWishlist = () => {
-    if (!isInWishlist) {
-      addToWishlist(product);
-      setIsInWishlist(true);
-      Alert.alert(
-        "Product added to Wishlist, do you want to switch to your wishlist?",
-        "",
-        [
-          {
-            text: "No, keep shopping",
-            onPress: () => navigation.goBack(),
-            style: "cancel",
-          },
-          {
-            text: "Yes",
-            onPress: () => {
-              navigation.navigate("Wishlist");
-            },
-          },
-        ],
-        { cancelable: false }
-      );
-    }
-  };
+  const handleAddToCart = async () => {
+    await addProductToCart({user,product,selectedVariations,shipmentOption,deliveryFee,selectedPickupStation,selectedAddress,navigation,addToCart,setIsInCart,
+    });
+};
+ 
+const handleAddToWishlist = () => {
+  addProductToWishlist({
+      isInWishlist,
+      product,
+      addToWishlist,
+      setIsInWishlist,
+      navigation,
+  });
+};
 
   const handleVariationSelect = (variationName, option) => {
     setSelectedVariations((prevState) => ({
@@ -453,8 +335,8 @@ const ProductDetails = () => {
 
   const inStock = product?.stock > 0;
   const regularPrice = product.price ? `$${product.price}` : null;
-  const discountPrice = product.discount_price
-    ? `$${product.discount_price}`
+  const discountPrice = product.discountPrice
+    ? `$${product.discountPrice}`
     : null;
   const priceComponent = discountPrice ? (
     <View style={styles.pricesContainer}>
@@ -483,518 +365,58 @@ const ProductDetails = () => {
         marginTop: Platform.OS === "ios" ? 40 : StatusBar.currentHeight,
       }}
     >
-         <Header title={product.name} onBackPress={() => navigation.goBack()} />
+      <Header title={product.name} onBack={() => navigation.goBack()} />
       <ScrollView>
         <View
           style={{
             paddingHorizontal: 15,
             paddingVertical: 10,
-            marginBottom: 10,
             backgroundColor: "#fff",
           }}
         >
-          <View style={{ height: 175, marginBottom: 10 }}>
-            <Swiper
-              loop={true}
-              autoplay={true}
-              autoplayTimeout={2.5}
-              activeDotColor={"#ff4800"}
-              bounces={true}
-              paginationStyle={{ position: "absolute", bottom: 0 }}
-            >
-              {product.images.map((image, i) => (
-                <View key={i} style={{ alignItems: "center" }}>
-                  <Image
-                    source={{ uri: image }}
-                    style={[styles.centerElement, { width: 200, height: 175 }]}
-                  />
-                </View>
-              ))}
-            </Swiper>
-          </View>
-          <Text style={{ fontSize: 16, marginBottom: 15 }}>{product.name}</Text>
-          <View style={styles.vendorLabel}>
-            <Text style={{ fontSize: 14, color: "#999" }}>
-              Condition:{" "}
-              <Text style={styles.vendorName}>{product.condition}</Text>
-            </Text>
-          </View>
+          <ImageSlider images={product.images} />
+          <ProductInfo name={product.name} condition={product.condition} />
         </View>
-
         <View style={styles.detailsContainer}>
           <View
             style={{
               flexDirection: "row",
               alignItems: "start",
               justifyContent: "space-between",
-              marginBottom: 5,
+              marginVertical: 5,
             }}
           >
-            <View style={styles.vendorContainer}>
-              {product.store && (
-                <View style={styles.vendorLabel}>
-                  <Text style={{ fontSize: 14, color: "#999" }}>
-                    Sold By:{" "}
-                    <Text style={styles.vendorName}>{product.store}</Text>
-                  </Text>
-                </View>
-              )}
-            </View>
-            <View style={{ flexDirection: "row" }}>
-              <TouchableOpacity
-                style={{ marginRight: 10 }}
-                onPress={addProductToWishlist}
-              >
-                <AntDesign
-                  name={isInWishlist ? "heart" : "hearto"}
-                  size={24}
-                  color={isInWishlist ? "red" : "black"}
-                />
-              </TouchableOpacity>
-              <Text style={{ fontSize: 16, color: colors.black }}>
-                {isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
-              </Text>
-            </View>
-          </View>
-          <View style={{ marginBottom: 10 }}>
-            <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
-            >
-              <Text style={styles.productPrice}>{priceComponent}</Text>
-              <View style={styles.airbnbRatingContainer}>
-                <Text style={styles.vendorLabel}>Overall Rating:</Text>
-                <AirbnbRating
-                  defaultRating={product.rating ? product.rating : 0}
-                  size={15}
-                  showRating={false}
-                />
-              </View>
-            </View>
-
-            <View style={styles.container}>
-              <View style={styles.ratingContainer}>
-                <Text style={styles.vendorLabel}>Customer Reviews:</Text>
-          
-                  <TouchableOpacity onPress={() => setShowModal(true)}>
-                    <View style={styles.ratingItem}>
-                      <View style={{ flexDirection: "row" }}>
-                        <MaterialIcons name="person" size={18} />
-                        <Text>
-                          Customer: Test
-                        </Text>
-                      </View>
-                      <Text>
-                        Rating:
-                        <AirbnbRating
-                          defaultRating={4}
-                          size={13}
-                          showRating={false}
-                        />
-                      </Text>
-                      <Text>Comment:Test</Text>
-                      <View style={{ flexDirection: "row" }}>
-                        <Text>See All Reviews</Text>
-                        <AntDesign name="arrowright" size={20} color="#000" />
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-    
-               
-              </View>
-            </View>
-            {/* Modal to display all reviews */}
-            <Modal
-              animationType="slide"
-              transparent={true}
-              visible={showModal}
-              onRequestClose={() => setShowModal(false)}
-            >
-              <View style={styles.modalContainer}>
-                <View style={styles.modalContent}>
-                  <TouchableOpacity
-                    style={styles.closeButton}
-                    onPress={() => setShowModal(false)}
-                  >
-                    <MaterialIcons name="close" size={24} />
-                  </TouchableOpacity>
-                
-                </View>
-              </View>
-            </Modal>
-          </View>
-          {/**Delivery & Returns */}
-          <View
-            style={{
-              paddingHorizontal: 15,
-              paddingVertical: 15,
-              backgroundColor: "#fff",
-              marginVertical: 15,
-            }}
-          >
-            {/* Shipment Options Section */}
-            <View
-              style={{
-                paddingVertical: 10,
-                borderBottomWidth: 1,
-                borderColor: "#f4f4f4",
-              }}
-            >
-              <Text
-                style={{ fontWeight: "bold", fontSize: 16, marginBottom: 10 }}
-              >
-                Delivery Options
-              </Text>
-            </View>
-
-            {/* Render "Pickup Station" option */}
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <RadioButton
-                value="Pickup Station"
-                status={
-                  shipmentOption === "Pickup Station" ? "checked" : "unchecked"
-                }
-                onPress={() => {
-                  setShipmentOption("Pickup Station");
-                  setIsModalVisible(true); // Open the modal when "Pickup Station" is selected
-                }}
-              />
-              <Entypo name="shop" size={24} color="black" />
-              <View
-                style={{
-                  marginBottom: 10,
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  marginLeft: 10,
-                }}
-              >
-                <Text style={{ marginLeft: 2, fontWeight: "bold" }}>
-                  Pickup Station
-                </Text>
-
-                {/* TouchableOpacity for selecting or changing a pickup station */}
-                {shipmentOption === "Pickup Station" && (
-                  <TouchableOpacity
-                    onPress={() => setIsModalVisible(true)} // Open the modal on press
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      padding: 5,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 11,
-                        color: colors.danger,
-                        padding: 5,
-                      }}
-                    >
-                      {/* Display appropriate text based on whether a pickup station is selected */}
-                      {selectedPickupStation
-                        ? `Pickup at ${selectedPickupStation.name} - Change Pickup Station`
-                        : "Please select a pickup station"}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-                <Text style={{ fontSize: 11 }}>
-                  Delivery Fees ${deliveryFee}
-                </Text>
-                <Text style={{ fontSize: 11 }}>
-                  Pickup by {expectedDeliveryDate} when you order today
-                </Text>
-              </View>
-            </View>
-
-            {/* Modal for selecting pickup station */}
-            <Modal
-              visible={isModalVisible}
-              onRequestClose={() => setIsModalVisible(false)}
-              transparent={true}
-            >
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "rgba(0, 0, 0, 0.5)",
-                }}
-              >
-                {loading ? (
-                  <View style={[styles.centerElement, { height: 10 }]}>
-                    <ActivityIndicator size="large" color="#ef5739" />
-                  </View>
-                ) : (
-                  <View
-                    style={{
-                      backgroundColor: "white",
-                      padding: 20,
-                      borderRadius: 8,
-                      width: "80%",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontWeight: "bold",
-                        fontSize: 16,
-                        marginBottom: 10,
-                      }}
-                    >
-                      Select State and City
-                    </Text>
-
-                    {/* State dropdown */}
-                    <Text style={{ fontSize: 14, marginBottom: 5 }}>
-                      Select State:
-                    </Text>
-                    <Picker
-                      selectedValue={selectedState}
-                      onValueChange={handleStateChange}
-                    >
-                      {/* Provide options for the available states */}
-                      <Picker.Item label="Select State" value="" />
-                      {[
-                        ...new Set(
-                          pickupStations.map((station) => station.address.state)
-                        ),
-                      ].map((state, index) => (
-                        <Picker.Item key={index} label={state} value={state} />
-                      ))}
-                    </Picker>
-
-                    {/* City dropdown */}
-                    <Text
-                      style={{ fontSize: 14, marginBottom: 5, marginTop: 10 }}
-                    >
-                      Select City:
-                    </Text>
-                    <Picker
-                      selectedValue={selectedCity}
-                      onValueChange={handleCityChange}
-                    >
-                      {/* Provide options for the available cities based on the selected state */}
-                      <Picker.Item
-                        label="Please choose a city"
-                        value="Please choose a city"
-                      />
-                      {[
-                        ...new Set(
-                          pickupStations
-                            .filter(
-                              (station) =>
-                                station.address.state === selectedState
-                            )
-                            .map((station) => station.address.city)
-                        ),
-                      ].map((city, index) => (
-                        <Picker.Item key={index} label={city} value={city} />
-                      ))}
-                    </Picker>
-
-                    {/* List of filtered pickup stations */}
-                    <Text
-                      style={{
-                        fontWeight: "bold",
-                        fontSize: 16,
-                        marginTop: 10,
-                      }}
-                    >
-                      Pickup Stations:
-                    </Text>
-                    <FlatList
-                      data={filteredPickupStations}
-                      keyExtractor={(item) => item._id}
-                      renderItem={({ item }) => (
-                        <TouchableOpacity
-                          onPress={() => handlePickupStationSelect(item)}
-                        >
-                          <Text style={{ paddingVertical: 10 }}>
-                            {item.name} - {item.address.street}
-                          </Text>
-                        </TouchableOpacity>
-                      )}
-                    />
-
-                    {/* Close modal button */}
-                    <TouchableOpacity onPress={() => setIsModalVisible(false)}>
-                      <Text
-                        style={{
-                          color: "red",
-                          marginTop: 20,
-                          textAlign: "center",
-                        }}
-                      >
-                        Close
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
-              </View>
-            </Modal>
-
-            {/* Render "Door Delivery" option */}
-
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <RadioButton
-                value="Door Delivery"
-                status={
-                  shipmentOption === "Door Delivery" ? "checked" : "unchecked"
-                }
-                onPress={() => setShipmentOption("Door Delivery")}
-              />
-              <MaterialCommunityIcons
-                name="truck-delivery"
-                size={25}
-                color="#000"
-              />
-              <View
-                style={{
-                  marginBottom: 10,
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  marginLeft: 10,
-                }}
-              >
-                <Text style={{ marginLeft: 2, fontWeight: "bold" }}>
-                  Door Delivery
-                </Text>
-                {/* If door delivery is selected, show the default delivery address */}
-                {shipmentOption === "Door Delivery" && (
-                  <Text style={{ fontSize: 11, color: "red" }}>
-                    Deliver to {selectedAddress?.name} -{" "}
-                    {selectedAddress?.street}
-                  </Text>
-                )}
-                
-                <Text style={{ fontSize: 11 }}>
-                  Delivery Fees ${deliveryFee}
-                </Text>
-                <Text style={{ fontSize: 11 }}>
-                  Deliver by {expectedDeliveryDate} when you order today
-                </Text>
-              </View>
-            </View>
-
-            <LocationModal
-              modalVisible={modalVisible}
-              setModalVisible={setModalVisible}
-              deliveryAddresses={deliveryAddresses}
-              selectedAddress={selectedAddress}
-              setSelectedAddress={setSelectedAddress}
-              navigation={navigation}
-              user={user}
+            <VendorInfo store={product.store.businessName} />
+            <WishlistButton
+              isInWishlist={isInWishlist}
+              onPress={handleAddToWishlist}
             />
-
-            {/* Return Policy Section */}
-            <View
-              style={{
-                marginBottom: 10,
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <FontAwesome6 name="clock-rotate-left" size={20} color="black" />
-              <View style={{ marginLeft: 10, marginTop: 10 }}>
-                <Text
-                  style={{ fontWeight: "bold", fontSize: 14, marginBottom: 2 }}
-                >
-                  Return Policy
-                </Text>
-                {/* Display return policy details */}
-                <Text style={{ fontSize: 11 }}>
-                  Our return policy allows for free returns within 7 days for
-                  eligible products.
-                  {/* Add more details here */}
-                </Text>
-              </View>
-            </View>
           </View>
-
-          {/** Product Details */}
-          <View
-            style={{
-              paddingHorizontal: 15,
-              paddingVertical: 15,
-              backgroundColor: "#fff",
-            }}
-          >
-            <Text
-              style={{
-                fontWeight: "bold",
-                paddingBottom: 10,
-                borderBottomWidth: 1,
-                borderColor: "#f4f4f4",
-              }}
-            >
-              Product Details
-            </Text>
-            <View
-              style={{
-                flexDirection: "row",
-                paddingVertical: 10,
-                borderBottomWidth: 1,
-                borderColor: "#f4f4f4",
-              }}
-            >
-              <Text style={{ width: "50%", color: "#939393" }}>In Stock:</Text>
-              <Text style={{ width: "50%" }}>{product.stock}</Text>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                paddingVertical: 10,
-                borderBottomWidth: 1,
-                borderColor: "#f4f4f4",
-              }}
-            >
-              <Text style={{ width: "50%", color: "#939393" }}>Brand:</Text>
-              <Text style={{ width: "50%" }}>
-                {product.brand ? product.brand : "N/A"}
-              </Text>
-            </View>
-            {/* Render variations only if variations exist */}
-            {product.variations && product.variations.length > 0 && (
-              <View
-                style={{
-                  flexDirection: "row",
-                  paddingVertical: 10,
-                  borderBottomWidth: 1,
-                  borderColor: "#f4f4f4",
-                }}
-              >
-                <Text style={{ width: "50%", color: "#939393" }}>
-                  Variations:
-                </Text>
-                <View style={{ width: "50%" }}>
-                  {product.variations.map((variation, index) => (
-                    <View key={index}>
-                      <Text>{variation.name}:</Text>
-                      {variation.options.map((option, optionIndex) => (
-                        <View
-                          key={optionIndex}
-                          style={{ flexDirection: "row", alignItems: "center" }}
-                        >
-                          <RadioButton
-                            value={option}
-                            status={
-                              selectedVariations[variation.name] === option
-                                ? "checked"
-                                : "unchecked"
-                            }
-                            onPress={() =>
-                              handleVariationSelect(variation.name, option)
-                            }
-                          />
-                          <Text>{option}</Text>
-                        </View>
-                      ))}
-                    </View>
-                  ))}
-                </View>
-              </View>
-            )}
-            <Text style={{ paddingVertical: 10, color: "#939393" }}>
-              {product.description}
-            </Text>
-          </View>
+          <PriceRating
+            priceComponent={priceComponent}
+            rating={product.rating}
+          />
+          <CustomerReviews
+            ratings={product.ratings}
+            maskUserName={maskUserName}
+          />
+          {/**Delivery & Returns */}
+          <DeliveryAndReturns
+            colors={colors} selectedPickupStation={selectedPickupStation} setSelectedPickupStation={setSelectedPickupStation} deliveryFee={deliveryFee}
+            expectedDeliveryDate={expectedDeliveryDate} shipmentOption={shipmentOption} setShipmentOption={setShipmentOption} selectedState={selectedState} setSelectedState={setSelectedState}
+            handleStateChange={handleStateChange} selectedCity={selectedCity} setSelectedCity={setSelectedCity}
+            handleCityChange={handleCityChange} pickupStations={pickupStations}
+            filteredPickupStations={filteredPickupStations} handlePickupStationSelect={handlePickupStationSelect} isModalVisible={isModalVisible}
+            setIsModalVisible={setIsModalVisible} loading={loading} modalVisible={modalVisible}
+            setModalVisible={setModalVisible} deliveryAddresses={deliveryAddresses}
+            selectedAddress={selectedAddress} setSelectedAddress={setSelectedAddress}
+            navigation={navigation} user={user}
+          />
+        <DetailsSection
+        product={product}
+        selectedVariations={selectedVariations}
+        handleVariationSelect={handleVariationSelect}
+      />
         </View>
         <View
           style={{
@@ -1024,7 +446,7 @@ const ProductDetails = () => {
                 isInCart && { backgroundColor: "#ccc" },
               ]}
               disabled={!inStock || isInCart}
-              onPress={inStock && !isInCart ? addProductToCart : undefined}
+              onPress={inStock && !isInCart ? handleAddToCart : undefined}
             >
               <Text style={styles.buttonText}>
                 {isInCart
@@ -1050,6 +472,5 @@ const ProductDetails = () => {
     </SafeAreaView>
   );
 };
-
 
 export default ProductDetails;
