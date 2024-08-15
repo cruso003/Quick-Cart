@@ -1,13 +1,15 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import authApi from '../api/auth/auth';
+import { useNavigation } from '@react-navigation/native';
 
-export const AuthContext = createContext();
+const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const navigation = useNavigation();
 
   useEffect(() => {
     // Check if the user is already logged in on initial render
@@ -41,6 +43,7 @@ export const AuthProvider = ({ children }) => {
 
       // Update the user state
       setUser(userData);
+      navigation.goBack();
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     } finally {
@@ -53,6 +56,7 @@ export const AuthProvider = ({ children }) => {
       await AsyncStorage.removeItem('userData');
       await AsyncStorage.removeItem('isLoggedIn');
       setUser(null);
+      navigation.navigate("/home");
     } catch (err) {
       console.error('Error during logout:', err);
     }
@@ -72,3 +76,14 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};
+
+export { AuthProvider, useAuth };
+
