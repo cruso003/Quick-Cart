@@ -5,6 +5,7 @@ import { ForgotPassword, VerifyOtp } from "../../src/screens/user/index";
 import SingleCategory from "../../src/screens/categories/SingleCategory.js";
 import BannerProducts from "../../src/screens/products/BannerProduct.js";
 import ProductDetails from "../../src/screens/products/ProductDetails.js";
+import CartPage from "../../src/screens/cart/cart.js";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,6 +20,7 @@ export default function HomeStack() {
         />
         <Stack.Screen name="BannerProduct" component={BannerProducts} />
         <Stack.Screen name="ProductDetails" component={ProductDetails}/>
+        <Stack.Screen name="Cart" component={CartPage} />
       </Stack.Group>
 
       {/* CategoryStack */}

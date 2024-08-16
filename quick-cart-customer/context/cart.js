@@ -63,12 +63,12 @@ const CartProvider = ({ children }) => {
         // If user is not logged in, just add the item to the cart locally
         const updatedCartItem = {
           ...cartItem,
-          qty: 1,
+          quantity: 1,
           checked: true,
         };
         const updatedCart = [...cart, updatedCartItem];
         setCart(updatedCart);
-        console.log(cart);
+        console.log(cart, "cart");
       }
     } catch (error) {
       console.error("Error adding item to cart: ", error);
@@ -110,12 +110,12 @@ const CartProvider = ({ children }) => {
   const quantityHandler = (action, index) => {
     // Handle quantity changes (increase or decrease) based on the provided action
     const updatedCart = [...cart];
-    const currentQty = updatedCart[index].qty;
+    const currentQty = updatedCart[index].quantity;
 
     if (action === "less" && currentQty > 1) {
-      updatedCart[index].qty -= 1;
+      updatedCart[index].quantity -= 1;
     } else if (action === "more") {
-      updatedCart[index].qty += 1;
+      updatedCart[index].quantity += 1;
     }
 
     setCart(updatedCart);
@@ -126,9 +126,9 @@ const CartProvider = ({ children }) => {
     return cart.reduce((total, item) => {
       // Only include the item in the subtotal calculation if it is checked
       if (item.checked) {
-        return item.salePrice
-          ? total + item.qty * item.salePrice
-          : total + item.qty * item.amount;
+        return item.discountPrice
+          ? total + item.quantity * item.discountPrice
+          : total + item.quantity * item.amount;
       }
       return total;
     }, 0);

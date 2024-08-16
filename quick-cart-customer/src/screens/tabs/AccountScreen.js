@@ -27,10 +27,13 @@ import ProfileSection from "../../components/ProfileSection";
 import colors from "../../../theme/colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ListItem from "../../components/ListItem";
+import { useCart } from "../../../context/cart";
 
 function Account() {
   const navigation = useNavigation();
   const [user, setUser] = useState(null);
+  const { cart } = useCart();
+  const [cartLength, setCartLength] = useState(0);
 
   const getData = useCallback(async () => {
     try {
@@ -51,6 +54,12 @@ function Account() {
       getData();
     }, [getData])
   );
+
+  useEffect(() => {
+    if (cart) {
+      setCartLength(cart.length);
+    }
+  }, [cart]);
 
   const handleLoginOrLogout = async () => {
     if (user) {
@@ -93,7 +102,14 @@ function Account() {
               onPress={() => navigation.navigate("Cart")}
               style={[styles.centerElement, { width: 50, height: 50 }]}
             >
-              <MaterialIcons name="shopping-cart-checkout" size={28} color="#fff" />
+              <IconBadge
+               IconComponent={MaterialIcons}
+               name="shopping-cart-checkout"
+                size={28}
+                color="#fff"
+                badgeCount={cartLength}
+                badgeColor={colors.primary}
+              />
             </TouchablePlatformSpecific>
             <TouchablePlatformSpecific
               onPress={handleMessageOpen}
@@ -105,7 +121,7 @@ function Account() {
                 size={28}
                 color="#fff"
                 badgeCount={8}
-                badgeColor="red"
+                badgeColor={colors.primary}
               />
             </TouchablePlatformSpecific>
           </View>
