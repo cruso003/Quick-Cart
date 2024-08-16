@@ -75,7 +75,7 @@ const Header = ({ navigation, cartLength, handleMessageOpen }) => {
               right: 5,
               top: 5,
               backgroundColor:
-                cartLength > 0 ? colors.secondary : "transparent",
+                cartLength > 0 ? colors.primary : "transparent",
               borderRadius: 9,
             },
           ]}
@@ -100,9 +100,7 @@ const Header = ({ navigation, cartLength, handleMessageOpen }) => {
               position: "absolute",
               right: 5,
               top: 5,
-              backgroundColor: "red",
-              borderWidth: 1,
-              borderColor: "#fff",
+              backgroundColor: colors.primary,
               borderRadius: 9,
             },
           ]}

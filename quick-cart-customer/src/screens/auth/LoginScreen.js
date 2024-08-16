@@ -16,7 +16,7 @@ import * as Yup from "yup";
 import tailwind from "twrnc";
 import SubmitButton from "../../components/button/SubmitButton";
 import Divider from "../../components/divider/Divider";
-import { AuthContext } from '../../../context/auth';
+import { useAuth } from "../../../context/auth";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
@@ -26,7 +26,7 @@ const validationSchema = Yup.object().shape({
 });
 
 const LoginScreen = () => {
-  const { login, error, isLoading } = useContext(AuthContext);
+  const { login, error, isLoading } = useAuth();
   const navigation = useNavigation();
 
   const handleLogin = (values) => {

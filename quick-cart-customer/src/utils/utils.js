@@ -71,6 +71,7 @@ export const addProductToCart = async ({
         ],
         { cancelable: false }
     );
+console.log(cartItem);
 
     addToCart(cartItem);
     setIsInCart(true);

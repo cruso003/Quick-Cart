@@ -13,8 +13,10 @@ import IconBadge from '../../components/IconBadge';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NotificationItem from '../../components/notification/NotificationItems';
 import colors from '../../../theme/colors';
+import { useCart } from '../../../context/cart';
 
 const Notifications = () => {
+  const { cart } = useCart();
   const [cartLength, setCartLength] = useState(0);
   const navigation = useNavigation();
   const [user, setUser] = useState(null);
@@ -44,8 +46,10 @@ const Notifications = () => {
   };
 
   useEffect(() => {
-    // Placeholder for cart length from context
-  }, []);
+    if (cart) {
+      setCartLength(cart.length);
+    }
+  }, [cart]);
 
   return (
     <SafeAreaView style={styles.safeArea}>

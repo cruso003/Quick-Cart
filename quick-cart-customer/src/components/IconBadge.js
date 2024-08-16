@@ -14,8 +14,6 @@ const IconBadge = ({ IconComponent, name, size, color, badgeCount, badgeColor })
             right: -5,
             top: 0,
             backgroundColor: badgeColor || "red",
-            borderWidth: 1,
-            borderColor: "#fff",
             borderRadius: 9,
             justifyContent: "center",
             alignItems: "center",

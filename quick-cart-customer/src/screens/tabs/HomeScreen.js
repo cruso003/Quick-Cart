@@ -14,8 +14,10 @@ import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import colors from "../../../theme/colors";
 import BrandedProducts from "../../components/home/BrandedProducts";
 import FeaturedCollection from "../../components/home/FeaturedProducts";
+import { useCart } from "../../../context/cart";
 
 const HomeScreen = () => {
+  const { cart } = useCart();
   const [cartLength, setCartLength] = useState(0);
   const navigation = useNavigation();
   const [timerDuration, setTimerDuration] = useState(15 * 60 * 60);
@@ -84,11 +86,11 @@ const HomeScreen = () => {
     }
   }, [user]);
 
- /* useEffect(() => {
-    /*if (cart) {
+  useEffect(() => {
+    if (cart) {
       setCartLength(cart.length);
     }
-  }, [cart]);*/
+  }, [cart]);
 
   const toggleModal = () => {
     setModalVisible(!modalVisible);

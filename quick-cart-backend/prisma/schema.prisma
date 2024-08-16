@@ -178,13 +178,24 @@ model Cart {
 }
 
 model CartItem {
-  id                  String             @id @default(auto()) @map("_id") @db.ObjectId
-  product             Product            @relation(fields: [productId], references: [id])
-  productId           String             @db.ObjectId
-  variationSelections VariationSelection[]
-  cartId              String             @db.ObjectId
-  cart                Cart               @relation(fields: [cartId], references: [id])
-  quantity            Int
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  quantity          Int
+  checked           Boolean
+  selectedVariations Json?
+  shipmentOption    String?
+  deliveryFee       Float?
+  selectedCity      String?
+  selectedState     String?
+  selectedPickupStation String?
+  selectedAddress   String?
+  discountPrice     Float?
+  productId         String   @db.ObjectId
+  cartId            String   @db.ObjectId
+
+  product Product @relation(fields: [productId], references: [id])
+  cart    Cart    @relation(fields: [cartId], references: [id])
+
+  VariationSelection VariationSelection[]
 }
 
 model VariationSelection {
