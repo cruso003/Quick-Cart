@@ -20,6 +20,7 @@ export default function HomeStack() {
         />
         <Stack.Screen name="BannerProduct" component={BannerProducts} />
         <Stack.Screen name="ProductDetails" component={ProductDetails}/>
+        
         <Stack.Screen name="Checkout" component={Checkout} />
       </Stack.Group>
 
