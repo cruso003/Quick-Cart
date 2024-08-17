@@ -6,6 +6,8 @@ import SingleCategory from "../../src/screens/categories/SingleCategory.js";
 import BannerProducts from "../../src/screens/products/BannerProduct.js";
 import ProductDetails from "../../src/screens/products/ProductDetails.js";
 import Checkout from "../../src/screens/checkout/Checkout.js";
+import CartPage from "../../src/screens/cart/cart.js";
+
 
 const Stack = createNativeStackNavigator();
 
@@ -19,9 +21,9 @@ export default function HomeStack() {
           component={BottomTab}
         />
         <Stack.Screen name="BannerProduct" component={BannerProducts} />
-        <Stack.Screen name="ProductDetails" component={ProductDetails}/>
-        
+        <Stack.Screen name="ProductDetails" component={ProductDetails}/>       
         <Stack.Screen name="Checkout" component={Checkout} />
+        <Stack.Screen name="Cart" component={CartPage} />
       </Stack.Group>
 
       {/* CategoryStack */}

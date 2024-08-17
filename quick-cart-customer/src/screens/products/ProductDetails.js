@@ -20,6 +20,7 @@ const ProductDetails = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { addToCart, cart } = useCart();
+  const [cartLength, setCartLength] = useState(0);
   const { addToWishlist, isProductInWishlist } = useWishlist();
   const [product, setProduct] = useState(null);
   const [isInWishlist, setIsInWishlist] = useState(false);
@@ -41,6 +42,12 @@ const ProductDetails = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (cart) {
+      setCartLength(cart.length);
+    }
+  }, [cart]);
 
 
   const fetchSender = async () => {
@@ -365,7 +372,7 @@ const handleAddToWishlist = () => {
         marginTop: Platform.OS === "ios" ? 40 : StatusBar.currentHeight,
       }}
     >
-      <Header title={product.name} onBack={() => navigation.goBack()} />
+      <Header title={product.name} onBack={() => navigation.goBack()} cartLength={cartLength}/>
       <ScrollView>
         <View
           style={{

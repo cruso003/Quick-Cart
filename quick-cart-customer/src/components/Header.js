@@ -41,7 +41,7 @@ function Header({ title, cartLength, onBack, onCart, onShare, onMore }) {
               right: 5,
               top: 5,
               backgroundColor:
-                cartLength > 0 ? colors.secondary : "transparent",
+                cartLength > 0 ? colors.primary : "transparent",
               borderRadius: 9,
             },
           ]}
