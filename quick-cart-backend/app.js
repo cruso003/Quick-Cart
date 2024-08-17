@@ -16,6 +16,7 @@ import orderRoute from "./src/routes/order.route.js";
 import walletRoute from "./src/routes/wallet.route.js";
 import pickupstationRoute from "./src/routes/pickupstation.route.js";
 import messageRoute from "./src/routes/message.route.js";
+import paymentRoute from "./src/routes/payment.route.js";
 
 // Initialize Express
 const app = express();
@@ -42,6 +43,8 @@ app.use('/api/v1/orders', orderRoute);
 app.use('/api/v1/wallet', walletRoute);
 app.use('/api/v1/pickupstation', pickupstationRoute);
 app.use('/api/v1/message', messageRoute);
+app.use('/api/v1/payment', paymentRoute);
+
 
 // Start the server
 const PORT = process.env.PORT;
