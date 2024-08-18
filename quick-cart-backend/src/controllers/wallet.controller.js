@@ -1,6 +1,5 @@
 import prisma from "../../lib/prisma.js";
 
-
 // Create Wallet
 export const createWallet = async (req, res) => {
   try {
@@ -21,14 +20,18 @@ export const createWallet = async (req, res) => {
 export const getWalletBalance = async (req, res) => {
   try {
     const { userId } = req.params;
-    const wallet = await prisma.wallet.findUnique({
+    let wallet = await prisma.wallet.findUnique({
       where: {
         userId,
       },
     });
 
     if (!wallet) {
-      return res.status(404).json({ error: "Wallet not found" });
+      wallet = await prisma.wallet.create({
+        data: {
+          userId,
+        },
+      });
     }
 
     res.json({ balance: wallet.balance });

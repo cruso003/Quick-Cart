@@ -215,13 +215,26 @@ model Order {
   status         String         @default("Pending")
   trackingNumber String?
   orderDate      DateTime       @default(now())
-  paymentId      String?        @db.ObjectId @unique
+  paymentId      String?        @unique
   payment        OrderPayment?  @relation("OrderPayment")
   totalAmount    Float
-  deliveryCharge Float
-  deliveryMethod Json
-  paymentMethod  String
-  type           String
+  deliveryCharge Float?
+  deliveryMethod String[]
+  paymentMethod  String?
+  type           String         @default("physical")
+}
+
+model OrderProduct {
+  id               String      @id @default(auto()) @map("_id") @db.ObjectId
+  productId        String      @db.ObjectId
+  orderId          String      @db.ObjectId
+  storeId          String      @db.ObjectId
+  quantity         Int
+  product          Product     @relation(fields: [productId], references: [id])
+  order            Order       @relation(fields: [orderId], references: [id])
+  store            Store       @relation(fields: [storeId], references: [id])
+  selectedVariations Json?
+  deliveryCharge    Float?
 }
 
 
@@ -231,17 +244,6 @@ model OrderPayment {
   order         Order?  @relation("OrderPayment", fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   amount        Float
   transactionId String  @default(uuid())
-}
-
-model OrderProduct {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  productId String   @db.ObjectId
-  orderId   String   @db.ObjectId
-  storeId   String   @db.ObjectId
-  quantity  Int
-  product   Product  @relation(fields: [productId], references: [id])
-  order     Order    @relation(fields: [orderId], references: [id])
-  store     Store    @relation(fields: [storeId], references: [id])
 }
 
 model Wallet {

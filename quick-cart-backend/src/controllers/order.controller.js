@@ -2,25 +2,45 @@ import prisma from "../../lib/prisma.js";
 
 
 export const placeOrder = async (req, res) => {
-  const { products, userId } = req.body;
+  const { products, userId, paymentId, deliveryCharge, totalAmount, deliveryMethod, paymentMethod, type } = req.body;
+  console.log(req.body);
 
-  const transaction = await prisma.$transaction(async (prisma) => {
-    try {
-      // Create a new order
+  try {
+    await prisma.$transaction(async (prisma) => {
       const newOrder = await prisma.order.create({
         data: {
           products: {
-            create: products.map(product => ({
-              productId: product.productId,
-              quantity: product.quantity,
-              storeId: product.storeId,
-            })),
+            create: await Promise.all(
+              products.map(async (product) => {
+                const productData = await prisma.product.findUnique({
+                  where: { id: product.productId },
+                  select: { storeId: true },
+                });
+
+                if (!productData) {
+                  throw new Error(`Product with id ${product.productId} not found.`);
+                }
+
+                return {
+                  product: { connect: { id: product.productId } },
+                  quantity: product.quantity,
+                  store: { connect: { id: productData.storeId } },
+                  selectedVariations: product.selectedVariations,
+                  deliveryCharge: product.deliveryCharge,
+                };
+              })
+            ),
           },
           userId: userId,
+          paymentId: paymentId,
+          deliveryCharge: deliveryCharge,
+          totalAmount: totalAmount,
+          deliveryMethod: deliveryMethod,
+          paymentMethod: paymentMethod,
+          type: type,
         },
       });
 
-      // Update product details for each product in the order
       for (const product of products) {
         await prisma.product.update({
           where: { id: product.productId },
@@ -34,15 +54,13 @@ export const placeOrder = async (req, res) => {
           },
         });
       }
+    });
 
-      return newOrder;
-    } catch (error) {
-      console.error(error);
-      throw new Error("Failed to place order");
-    }
-  });
-
-  res.status(201).json(transaction);
+    res.status(201).json({ message: "Order placed successfully." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to place order: " + error.message });
+  }
 };
 
 export const getOrders = async (req, res) => {

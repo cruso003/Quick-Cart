@@ -16,20 +16,17 @@ import uuid from "react-native-uuid";
 import walletApi from "../../../api/wallet/wallet";
 import { styles } from "./styles";
 import { useCheckout } from "../../hooks/useCheckout";
+import Header from "../../components/checkout/Header";
+import ProgressBar from "../../components/checkout/ProgressBar";
 
 function Checkout({ route, navigation }) {
   const { 
-    currentStep, setCurrentStep, stepTwo, setStepTwo, selectedPaymentMethod, 
-    setSelectedPaymentMethod, validateRequiredFields, makePayment, loading, requiredFieldsFilled, paymentMethods 
+    currentStep, setCurrentStep, stepTwo, setStepTwo, selectedPaymentMethod, createOrder,
+    setSelectedPaymentMethod, validateRequiredFields, makePayment, userId, RenderModal, calculateGrandTotal, paymentMethods, stepOne, steps, subtotalPrice 
   } = useCheckout(navigation, route);
 
-  const transactionId = uuid.v4();
-  const [steps] = useState(["Review", "Shipping", "Payment", "Submit"]);
-  const [stepOne] = useState({
-    cartItemsIsLoading: false,
-    cartItems: route.params.cartItems,
-  });
-
+  const paymentId = uuid.v4();
+  
 
   return (
     <KeyboardAvoidingView
@@ -38,54 +35,8 @@ function Checkout({ route, navigation }) {
       behavior={Platform.OS === "ios" ? "padding" : null}
     >
       <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={[styles.centerElement, styles.backButton]}
-            onPress={() => navigation.goBack()}
-          >
-            <MaterialIcons name="arrow-back" size={25} color="#000" />
-          </TouchableOpacity>
-          <View style={[styles.centerElement, styles.headerTitle]}>
-            <Text style={styles.headerTitleText}>Checkout</Text>
-          </View>
-        </View>
-
-        <View style={styles.progressBar}>
-          <View style={styles.progressBarInner}>
-            <View style={{ alignItems: "center" }}>
-              <View style={styles.progressLine} />
-            </View>
-            <View style={styles.stepContainer}>
-              {steps.map((label, i) => (
-                <View key={i} style={styles.stepItem}>
-                  {i > currentStep && i != currentStep /* Not selected */ && (
-                    <View style={styles.stepCircle}>
-                      <Text style={styles.stepText}>{i + 1}</Text>
-                    </View>
-                  )}
-                  {i < currentStep /* Checked */ && (
-                    <View style={styles.inputContainer}>
-                      <Ionicons
-                        name="checkmark-circle"
-                        size={20}
-                        color="#fff"
-                      />
-                    </View>
-                  )}
-                  {i == currentStep /* Selected */ && (
-                    <View style={styles.selected}>
-                      <Text style={{ fontSize: 13, color: "#ffffff" }}>
-                        {i + 1}
-                      </Text>
-                    </View>
-                  )}
-                  <Text style={{ fontSize: 12 }}>{label}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        </View>
-
+      <Header title="Checkout" onBackPress={() => navigation.goBack()} />
+      <ProgressBar steps={steps} currentStep={currentStep} />
         <ScrollView keyboardShouldPersistTaps={"handled"}>
           {/* Step 1 */}
           {currentStep == 0 && (
@@ -243,6 +194,7 @@ function Checkout({ route, navigation }) {
                   keyboardType="phone-pad"
                   placeholder="0881223344"
                   placeholderTextColor="#D3D3D3"
+                  maxLength={10}
                 />
               </View>
               <View>
@@ -425,7 +377,7 @@ function Checkout({ route, navigation }) {
                       // Call updateWalletBalance for virtual order
                       const walletApiResponse =
                         await walletApi.updateWalletBalance(
-                          user.id,
+                          userId,
                           topUpAmount
                         );
                       // Check if the wallet API call was successful
@@ -437,28 +389,31 @@ function Checkout({ route, navigation }) {
                     } else {
                       // It's a physical order, create the order
                       const orderDetails = {
-                        products: stepOne.cartItems.map((item) => ({
-                          product: item.product,
-                          store: item.product.store,
+                        products: stepOne.cartItems.map((item) => ({   
+                          product: item.product,             
+                          productId: item.productId,
                           quantity: item.quantity,
                           deliveryCharge: item.deliveryFee,
                           selectedVariations: item.selectedVariations,
                           deliveryMethod: item.shipmentOption,
                           paymentMethod: selectedPaymentMethod,
+                          store: item.store,
                           totalAmount:
                             parseFloat(subtotalPrice().toFixed(2)) +
                             parseFloat(item.deliveryFee.toFixed(2)),
                           type: "physical",
                         })),
-                        user: user.id,
+                        userId: userId,
                         status: "Pending",
-                        payment: {
-                          transactionId: transactionId,
-                          type: "Physical",
-                        },
+                        paymentId: paymentId,
+                        deliveryCharge: stepOne.cartItems.reduce((total, item) => total + item.deliveryFee, 0),
+                        totalAmount: stepOne.cartItems.reduce((total, item) => total + (item.quantity * item.product.price) + item.deliveryFee, 0),
+                        deliveryMethod: stepOne.cartItems.map((item)=> item.shipmentOption),
+                        paymentMethod: selectedPaymentMethod,
+                        type: "physical",
                       };
 
-                      await createOrder(orderDetails);                     
+                      await createOrder(orderDetails);
                     }
 
                     // After updating the wallet balance and creating the order, navigate to the home screen
@@ -487,7 +442,7 @@ function Checkout({ route, navigation }) {
           >
             {currentStep > 0 && currentStep < 4 && (
               <TouchableOpacity
-                style={[styles.centerElement, styles.NextButton]}
+                style={[styles.centerElement, styles.nextButton]}
                 onPress={() => {
                   if (currentStep > 0) {
                     setCurrentStep(currentStep - 1);
@@ -521,7 +476,7 @@ function Checkout({ route, navigation }) {
             {/* Call API to process payment */}
             {currentStep + 1 === steps.length && (
               <TouchableOpacity
-                style={[styles.centerElement, styles.NextButton]}
+                style={[styles.centerElement, styles.payButton]}
                 onPress={() => {
                   makePayment();
                 }}
@@ -531,6 +486,7 @@ function Checkout({ route, navigation }) {
             )}
           </View>
         </ScrollView>
+        {RenderModal()}
       </View>
     </KeyboardAvoidingView>
   );
