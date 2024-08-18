@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosResponse } from 'axios';
 
-const ServerUrl = "http://localhost:9000/api/v1";
+const ServerUrl = "http://13.60.232.45/api/v1";
 
 // Create axios instance with server url
 const globalApi = axios.create({
