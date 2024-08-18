@@ -136,7 +136,7 @@ export const createProduct = async (req, res) => {
   }
 };
 
-// Fetch products and include relevant dat
+// Fetch products and include relevant data
 export const getProducts = async (req, res) => {
   try {
     const products = await prisma.product.findMany({
@@ -167,7 +167,7 @@ export const getProducts = async (req, res) => {
       },
     });
 
-    // Map the response to include category, subcategory names, and average rating
+    // Map the response to include category, subcategory names, average rating, and lastUpdated
     const formattedProducts = products.map((product) => {
       const averageRating =
         product.ratings.length > 0
@@ -178,7 +178,8 @@ export const getProducts = async (req, res) => {
         ...product,
         categoryName: product.category?.title,
         subcategoryName: product.subcategory?.title,
-        averageRating, // Include the average rating
+        averageRating,
+        lastUpdated: product.lastUpdated,
         store: {
           name: product.store?.name,
           businessName: product.store?.businessName,
@@ -196,9 +197,6 @@ export const getProducts = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-
-
 
 // Search products
 export const searchProducts = async (req, res) => {

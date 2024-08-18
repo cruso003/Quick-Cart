@@ -2,48 +2,54 @@ import prisma from "../../lib/prisma.js";
 
 
 export const placeOrder = async (req, res) => {
-    const { products, userId } = req.body;
-  
-    const transaction = await prisma.$transaction(async (prisma) => {
-      try {
-        // Create a new order
-        const newOrder = await prisma.order.create({
-          data: {
-            products: {
-              create: products.map(product => ({
-                productId: product.productId,
-                quantity: product.quantity,
-                storeId: product.storeId,
-              })),
+  const { products, userId, payment } = req.body;
+
+  const transaction = await prisma.$transaction(async (prisma) => {
+    try {
+      // Create a new order
+      const newOrder = await prisma.order.create({
+        data: {
+          products: {
+            create: products.map(product => ({
+              productId: product.productId,
+              quantity: product.quantity,
+              storeId: product.storeId,
+            })),
+          },
+          userId: userId,
+          payment: {
+            create: {
+              amount: payment.amount,
+              transactionId: payment.transactionId,
             },
-            userId: userId,
+          },
+        },
+      });
+
+      // Update product details for each product in the order
+      for (const product of products) {
+        await prisma.product.update({
+          where: { id: product.productId },
+          data: {
+            totalSale: {
+              increment: product.quantity,
+            },
+            stock: {
+              decrement: product.quantity,
+            },
           },
         });
-  
-        // Update product details for each product in the order
-        for (const product of products) {
-          await prisma.product.update({
-            where: { id: product.productId },
-            data: {
-              totalSale: {
-                increment: product.quantity,
-              },
-              stock: {
-                decrement: product.quantity,
-              },
-            },
-          });
-        }
-  
-        return newOrder;
-      } catch (error) {
-        console.error(error);
-        throw new Error("Failed to place order");
       }
-    });
-  
-    res.status(201).json(transaction);
-  };
+
+      return newOrder;
+    } catch (error) {
+      console.error(error);
+      throw new Error("Failed to place order");
+    }
+  });
+
+  res.status(201).json(transaction);
+};
 
 export const getOrders = async (req, res) => {
   try {
@@ -52,19 +58,37 @@ export const getOrders = async (req, res) => {
       include: {
         products: {
           include: {
-            product: true,
+            product: {
+              include: {
+                category: {
+                  select: {
+                    title: true,
+                  },
+                },
+              },
+            },
           },
         },
         user: true,
       },
     });
 
-    res.json(orders);
+    // Format the orders to include the category name
+    const formattedOrders = orders.map(order => ({
+      ...order,
+      products: order.products.map(orderProduct => ({
+        ...orderProduct,
+        categoryName: orderProduct.product.category?.title || null,
+      })),
+    }));
+
+    res.json(formattedOrders);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 export const updateOrder = async (req, res) => {
   try {

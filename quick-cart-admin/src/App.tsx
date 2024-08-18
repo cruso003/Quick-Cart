@@ -18,6 +18,7 @@ import Categories from './components/dataTable/categoryTable';
 import NewCategory from './components/New/NewCategory';
 import NewBanner from './components/New/NewBanner';
 import NewSubcategory from './components/New/NewSubcategory';
+import Home from './pages/home/Home';
 
 const Layout = () => {
   return (
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
       {
         path: "/profile",
         element: <Profile />,

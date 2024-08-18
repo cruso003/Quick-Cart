@@ -31,6 +31,16 @@ const productRoutes = {
     updateProduct: "/products/:id",
 };
 
+const orderRoutes = {
+    getOrders: "/orders/get-orders",
+    createOrder: "/orders/place-order",
+    updateOrder: "/orders/update-order/:orderId",
+    cancelOrder: "/orders/cancel-order/:orderId",
+    getUserOrders: "/orders/user-orders",
+    getOrdersForStore: "/orders/store-orders",
+    placeVirtualOrder: "/orders/place-virtual-order",
+};
+
 const categoryRoutes = {
     getCategories: "/categories",
     createCategory: "/categories/create",
@@ -112,6 +122,25 @@ const authApiRequests = {
     },
 };
 
+const ordersApiRequests = {
+    getOrders: async (): Promise<AxiosResponse<any>> => {
+        return globalApi.get(orderRoutes.getOrders);
+    },
+    createOrder: async (orderData: any): Promise<AxiosResponse<any>> => {
+        return globalApi.post(orderRoutes.createOrder, orderData);
+    },
+    updateOrder: async (orderId: any, updatedOrderData: any): Promise<AxiosResponse<any>> => {
+        return globalApi.put(orderRoutes.updateOrder.replace(":id", orderId), updatedOrderData);
+    },
+    cancelOrder: async (orderId: any): Promise<AxiosResponse<any>> => {
+        return globalApi.delete(orderRoutes.cancelOrder.replace(":id", orderId));
+    },
+    getUserOrders: async (): Promise<AxiosResponse<any>> => {
+        return globalApi.get(orderRoutes.getUserOrders);
+    }
+
+}
+
 // Functions to make API requests for users
 const userApiRequest = {
     getUsers: async (params?: Record<string, any>): Promise<AxiosResponse<any>> => {
@@ -168,4 +197,5 @@ export {
     categoryApiRequests,
     subcategoryApiRequests,
     bannerApiRequests,
+    ordersApiRequests 
 };
