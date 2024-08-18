@@ -22,6 +22,7 @@ const userRoutes = {
     forgotPassword: "/user/forgot-password",
     verifyOtpAndResetPassword: "/user/verify-otp-reset-password",
     resendSecurityCode: "/user/resend-security-code",
+    deleteUser: "/user/delete-user/:id"
 };
 
 const productRoutes = {
@@ -137,7 +138,7 @@ const ordersApiRequests = {
     },
     getUserOrders: async (): Promise<AxiosResponse<any>> => {
         return globalApi.get(orderRoutes.getUserOrders);
-    }
+    },
 
 }
 
@@ -161,6 +162,9 @@ const userApiRequest = {
     resendSecurityCode: async (email: string): Promise<AxiosResponse<any>> => {
         return globalApi.post(userRoutes.resendSecurityCode, { email });
     },
+    deleteUser: async (id: any): Promise<AxiosResponse<any>> => {
+        return globalApi.delete(userRoutes.deleteUser.replace(":id", id));
+    }
 };
 
 // Functions to make API requests for banners

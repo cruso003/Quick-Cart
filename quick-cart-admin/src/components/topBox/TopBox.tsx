@@ -31,7 +31,7 @@ const TopBox = () => {
           );
 
           const totalAmount = userOrders.reduce(
-            (acc: number, order: any) => acc + order.products.price,
+            (acc: number, order: any) => acc + order.totalAmount,
             0
           );
           user.totalAmount = totalAmount;

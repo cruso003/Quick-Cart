@@ -451,21 +451,14 @@ function Checkout({ route, navigation }) {
                           type: "physical",
                         })),
                         user: user.id,
-                        status: "Delivered",
+                        status: "Pending",
                         payment: {
                           transactionId: transactionId,
                           type: "Physical",
-                          amount: stepOne.cartItems.reduce(
-                            (acc, item) =>
-                              acc +
-                              parseFloat(
-                                (subtotalPrice() + item.deliveryFee).toFixed(2)
-                              ),
-                            0
-                          ), // Calculate the total amount for the entire order
                         },
                       };
-                      await createOrder(orderDetails);                      
+
+                      await createOrder(orderDetails);                     
                     }
 
                     // After updating the wallet balance and creating the order, navigate to the home screen

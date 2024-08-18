@@ -19,7 +19,7 @@ const RevenueStats = () => {
 
         // Calculate total revenue
         const revenue = orders.reduce((acc: number, order: any) => {
-          return acc + order.products.amount;
+          return acc + order.totalAmount;
         }, 0);
 
         setTotalRevenue(revenue);
@@ -30,14 +30,14 @@ const RevenueStats = () => {
 
         const currentMonthRevenue = orders.reduce((acc: number, order: any) => {
           if (new Date(order.orderDate).getMonth() === currentMonth) {
-            return acc + order.products.amount;
+            return acc + order.totalAmount;
           }
           return acc;
         }, 0);
 
         const lastMonthRevenue = orders.reduce((acc: number, order: any) => {
           if (new Date(order.orderDate).getMonth() === lastMonth) {
-            return acc + order.products.amount;
+            return acc + order.totalAmount;
           }
           return acc;
         }, 0);
@@ -52,7 +52,7 @@ const RevenueStats = () => {
         const monthlyRevenue = Array.from({ length: 12 }, (_, i) => {
           const monthRevenue = orders.reduce((acc: number, order: any) => {
             if (new Date(order.orderDate).getMonth() === i) {
-              return acc + order.products.amount;
+              return acc + order.totalAmount;
             }
             return acc;
           }, 0);

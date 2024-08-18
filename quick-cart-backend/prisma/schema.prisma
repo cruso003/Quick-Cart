@@ -216,9 +216,14 @@ model Order {
   trackingNumber String?
   orderDate      DateTime       @default(now())
   paymentId      String?        @db.ObjectId @unique
-
   payment        OrderPayment?  @relation("OrderPayment")
+  totalAmount    Float
+  deliveryCharge Float
+  deliveryMethod Json
+  paymentMethod  String
+  type           String
 }
+
 
 model OrderPayment {
   id            String  @id @default(auto()) @map("_id") @db.ObjectId

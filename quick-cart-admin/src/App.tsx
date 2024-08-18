@@ -19,6 +19,8 @@ import NewCategory from './components/New/NewCategory';
 import NewBanner from './components/New/NewBanner';
 import NewSubcategory from './components/New/NewSubcategory';
 import Home from './pages/home/Home';
+import Users from './components/dataTable/userTable';
+import Orders from './components/dataTable/orderTable';
 
 const Layout = () => {
   return (
@@ -53,6 +55,14 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <Profile />,
+      },
+      {
+        path: "/users",
+        element: <Users />,
+      },
+      {
+        path: "/orders",
+        element: <Orders/>,
       },
       {
         path: "/products/add-product",
