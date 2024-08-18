@@ -15,6 +15,8 @@ import ForgotPassword from './pages/forgotPassword/ForgotPassword';
 import ResetPassword from './pages/resetpassword/ResetPassword';
 import NewProduct from './components/New/NewProduct';
 import Products from './components/dataTable/productTable';
+import Home from './pages/home/Home';
+import Orders from './components/dataTable/orderTable';
 
 const Layout = () => {
   return (
@@ -43,8 +45,16 @@ const router = createBrowserRouter([
     ),
     children: [
       {
+        path: "/",
+        element: <Home />,
+      },
+      {
         path: "/profile",
         element: <Profile />,
+      },
+      {
+        path: "/orders",
+        element: <Orders/>,
       },
       {
         path: "/products/add-product",
