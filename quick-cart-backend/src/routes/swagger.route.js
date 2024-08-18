@@ -17,7 +17,7 @@ try {
     const swaggerDocument = yaml.load(fs.readFileSync(yamlFilePath, 'utf8'));
 
     // Serve the OpenAPI documentation
-    router.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
   } else {
     console.error('Error: openapi.yaml file not found at path:', yamlFilePath);
   }
