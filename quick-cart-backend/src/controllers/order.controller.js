@@ -3,7 +3,6 @@ import prisma from "../../lib/prisma.js";
 
 export const placeOrder = async (req, res) => {
   const { products, userId, paymentId, deliveryCharge, totalAmount, deliveryMethod, paymentMethod, type } = req.body;
-  console.log(req.body);
 
   try {
     await prisma.$transaction(async (prisma) => {
