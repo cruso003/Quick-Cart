@@ -204,3 +204,19 @@ export const resendSecurityCode = async (req, res) => {
     }
 };
 
+// Delete user by ID
+export const deleteUserById = async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      
+      const deletedUser = await prisma.user.delete({
+        where: { id: userId },
+      });
+  
+      res.status(200).json({ success: true, message: "User deleted successfully", data: deletedUser });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  };
+  
+

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { ordersApiRequests } from "../../../api/api"; 
 import ChartBox from "../ChartBox";
 
-const TicketSalesStats = () => {
+const ProductSalesStats = () => {
   const [, setOrdersData] = useState<any[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [totalProductsSold, setTotalProductsSold] = useState<number>(0);
@@ -100,4 +100,4 @@ const TicketSalesStats = () => {
   return <ChartBox {...chartBoxProductSales} />;
 };
 
-export default TicketSalesStats;
+export default ProductSalesStats;

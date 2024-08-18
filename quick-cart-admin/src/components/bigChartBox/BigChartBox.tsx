@@ -46,7 +46,7 @@ const BigChartBox = () => {
               });
 
               // Sum revenue
-              monthData.revenue += order.payment.amount;
+              monthData.revenue += order.totalAmount;
             }
           });
 

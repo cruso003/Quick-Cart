@@ -2,7 +2,7 @@ import prisma from "../../lib/prisma.js";
 
 
 export const placeOrder = async (req, res) => {
-  const { products, userId, payment } = req.body;
+  const { products, userId } = req.body;
 
   const transaction = await prisma.$transaction(async (prisma) => {
     try {
@@ -17,12 +17,6 @@ export const placeOrder = async (req, res) => {
             })),
           },
           userId: userId,
-          payment: {
-            create: {
-              amount: payment.amount,
-              transactionId: payment.transactionId,
-            },
-          },
         },
       });
 
@@ -73,22 +67,25 @@ export const getOrders = async (req, res) => {
       },
     });
 
-    // Format the orders to include the category name
+    // Format the orders to include the category name, totalAmount, deliveryMethod, and paymentMethod
     const formattedOrders = orders.map(order => ({
       ...order,
+      totalAmount: order.totalAmount,
+      deliveryMethod: order.deliveryMethod,
+      paymentMethod: order.paymentMethod,
       products: order.products.map(orderProduct => ({
         ...orderProduct,
         categoryName: orderProduct.product.category?.title || null,
       })),
     }));
 
-    res.json(formattedOrders);
+    // Send the formatted orders as the response
+    res.status(200).json(formattedOrders);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 
 export const updateOrder = async (req, res) => {
   try {
