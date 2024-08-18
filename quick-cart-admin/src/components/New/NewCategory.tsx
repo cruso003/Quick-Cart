@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import "./new.scss";
-import "../../components/datatable/dataTable.scss";
+import "../../components/dataTable/dataTable.scss";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
 import { useState } from "react";
 import { categoryApiRequests } from "../../api/api";

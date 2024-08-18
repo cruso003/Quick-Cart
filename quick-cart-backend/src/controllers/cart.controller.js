@@ -14,11 +14,9 @@ export const getCartItems = async (req, res) => {
 };
 
 export const createCartItem = async (req, res) => {
-  console.log('Request Body:', req.body);
 
   try {
     // Retrieve or create a cart for the user
-    console.log('Looking for user cart with userId:', req.body.user);
     let userCart = await prisma.cart.findFirst({
       where: {
         userId: req.body.user,
@@ -26,32 +24,12 @@ export const createCartItem = async (req, res) => {
     });
 
     if (!userCart) {
-      console.log('No cart found, creating a new cart for userId:', req.body.user);
       userCart = await prisma.cart.create({
         data: {
           userId: req.body.user,
         },
       });
-      console.log('New cart created:', userCart);
-    } else {
-      console.log('Existing cart found:', userCart);
     }
-
-    // Add the item to the user's cart
-    console.log('Adding item to cart:', {
-      cartId: userCart.id,
-      productId: req.body.product,
-      discountPrice: req.body.salePrice,
-      quantity: req.body.qty || 1,
-      checked: req.body.checked !== undefined ? req.body.checked : true,
-      selectedVariations: req.body.selectedVariations,
-      shipmentOption: req.body.shipmentOption,
-      deliveryFee: req.body.deliveryFee,
-      selectedCity: req.body.selectedCity,
-      selectedState: req.body.selectedState,
-      selectedPickupStation: req.body.selectedPickupStation,
-      selectedAddress: req.body.selectedAddress,
-    });
 
     const newCartItem = await prisma.cartItem.create({
       data: {
@@ -77,8 +55,6 @@ export const createCartItem = async (req, res) => {
         selectedAddress: req.body.selectedAddress,
       },
     });
-
-    console.log('New cart item created:', newCartItem);
     res.status(201).json(newCartItem);
   } catch (err) {
     console.error('Error creating cart item:', err);
