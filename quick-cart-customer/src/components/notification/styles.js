@@ -5,7 +5,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#f6f6f6',
-    
+    marginTop: Platform.OS === 'android' ? StatusBar.currentHeight : 40
   },
   header: {
     flexDirection: 'row',

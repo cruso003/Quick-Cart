@@ -182,7 +182,8 @@ export const useCheckout = (navigation, route) => {
   const createOrder = async (orderDetails) => {
     try {
       const response = await ordersApi.placeOrder(orderDetails);
-      if (response.ok) {
+      
+      if (response.status === 201) {
         alert("Order created successfully");
       } else {
         alert("Failed to create order");
