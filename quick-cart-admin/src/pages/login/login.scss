@@ -17,9 +17,9 @@
     background-color: $main-bg;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
-    .logo{
-        margin-bottom: 2rem;
-        width: 150px;
+    .logo {
+      margin-bottom: 2rem;
+      width: 150px;
     }
 
     h2 {
@@ -98,16 +98,33 @@
     }
   }
 
-  .image-section{
+  .image-section {
     flex: 0.75;
     display: flex;
     justify-content: center;
     padding: 2rem;
     background-color: $dark-bg;
 
-    img{
-        max-width: 100%;
-        height: auto;
+    img {
+      max-width: 100%;
+      height: auto;
     }
+  }
+}
+
+@media (max-width: 768px) {
+  .image-section {
+    display: none;
+  }
+
+  .login-box {
+    flex: 1;
+    width: 100%;
+    max-width: none;
+    padding: 1rem;
+  }
+
+  form {
+    max-width: none;
   }
 }
