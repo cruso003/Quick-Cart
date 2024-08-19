@@ -12,7 +12,7 @@ const orderColumns: GridColDef[] = [
   {
     field: "product",
     headerName: "Product",
-    width: 260,
+    width: 220,
     renderCell: (params) => {
       return (
         <div className="cellWithImg">
@@ -29,7 +29,7 @@ const orderColumns: GridColDef[] = [
   {
     field: "customer",
     headerName: "Customer",
-    width: 200,
+    width: 150,
   },
   {
     field: "date",
@@ -39,7 +39,7 @@ const orderColumns: GridColDef[] = [
   {
     field: "amount",
     headerName: "Amount",
-    width: 150,
+    width: 100,
     renderCell: (params) => {
       return (
         <div className={`cellWithStatus ${params.row.amount}`}>
@@ -56,7 +56,7 @@ const orderColumns: GridColDef[] = [
   {
     field: "status",
     headerName: "Status",
-    width: 180,
+    width: 150,
     renderCell: (params) => {
       return (
         <div className={`cellWithStatus ${params.row.status}`}>
@@ -74,7 +74,6 @@ const Orders: React.FC = () => {
     const fetchOrders = async () => {
       try {
         const response = await ordersApiRequests.getOrders();
-        console.log(response.data);
         
         const transformedData = response.data.map((order: any) => ({
           id: order.id,
