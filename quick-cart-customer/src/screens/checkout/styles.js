@@ -273,4 +273,20 @@ export const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 5,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    zIndex: 999,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 18,
+    color: '#000',
+  },
 });

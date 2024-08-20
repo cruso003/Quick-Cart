@@ -7,6 +7,8 @@ import BannerProducts from "../../src/screens/products/BannerProduct.js";
 import ProductDetails from "../../src/screens/products/ProductDetails.js";
 import Checkout from "../../src/screens/checkout/Checkout.js";
 import CartPage from "../../src/screens/cart/cart.js";
+import ProfileSettings from "../../src/components/account/ProfileSettings.js";
+import WalletScreen from "../../src/components/account/Wallet.js";
 
 
 const Stack = createNativeStackNavigator();
@@ -45,6 +47,8 @@ export default function HomeStack() {
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
         <Stack.Screen name="VerifyOtp" component={VerifyOtp} />
+        <Stack.Screen name="ProfileSettings" component={ProfileSettings}/>
+        <Stack.Screen name="Wallet" component={WalletScreen}/>
       </Stack.Group>
 
       {/* NotificationStack */}
