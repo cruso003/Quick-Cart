@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { productApiRequests } from "../../api/api";
+import { useAuth } from "../../contexts/AuthContext";
 
 
 const productColumns: GridColDef[] = [
@@ -38,30 +39,38 @@ const productColumns: GridColDef[] = [
   },
   ];
 
-const Products: React.FC = () => {
-  const [products, setProducts] = useState([]);
-
-  const fetchProducts = async () => {
-    try {
-      const response = await productApiRequests.getProducts();
-      
-      /// Transform the fetched data to match the productRows format
-      const transformedData = response.data.map((product: any) => ({
-        id: product.id,
-        name: product.name,
-        img: product.images ? product.images[0] : "",
-        description: product.description,
-        total_sale: product.totalSale,
-        price: product.discount_price ? product.discount_price : product.price,
-      }));
-      setProducts(transformedData);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    }
-  };
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  const Products: React.FC = () => {
+    const { user } = useAuth();
+    const [products, setProducts] = useState([]);
+  
+    const fetchProducts = async () => {
+      try {
+        const response = await productApiRequests.getProducts();
+        
+        // Filter products based on the user's store ID
+        const filteredProducts = response.data.filter((product: any) => 
+          product.storeId === user.storeId
+        );
+  
+        // Transform the fetched data to match the productRows format
+        const transformedData = filteredProducts.map((product: any) => ({
+          id: product.id,
+          name: product.name,
+          img: product.images ? product.images[0] : "",
+          description: product.description,
+          total_sale: product.totalSale,
+          price: product.discount_price ? product.discount_price : product.price,
+        }));
+  
+        setProducts(transformedData);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+  
+    useEffect(() => {
+      fetchProducts();
+    }, [user.storeId]);
 
   const handleDelete = async (id: any) => {
     try {
