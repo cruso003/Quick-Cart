@@ -109,7 +109,7 @@ const Orders: React.FC = () => {
   
     useEffect(() => {
       fetchOrders();
-    }, []);
+    }, [user.storeId]);
   
     const handleDelete = async (id: any) => {
       try {
