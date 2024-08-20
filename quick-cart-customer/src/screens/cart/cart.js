@@ -1,36 +1,33 @@
-import { Ionicons, MaterialCommunityIcons, MaterialIcons, } from "@expo/vector-icons";
-import React, { useState } from "react";
+import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import React from "react";
 import { Image, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity,
-    View, StatusBar, StyleSheet, Platform, ActivityIndicator, } from "react-native";
+    View, StatusBar, StyleSheet, Platform, ActivityIndicator } from "react-native";
 import { useCart } from "../../../context/cart";
 import { useAuth } from "../../../context/auth";
 import colors from "../../../theme/colors";
 
 const CartPage = ({ navigation }) => {
     const { user } = useAuth();
+    const { cart, allItemsChecked, selectHandler, selectHandlerAll, deleteHandler,
+        quantityHandler, subtotalPrice, loading } = useCart();
+
     const handleCheckout = () => {
         if (user) {
-            // Filter out unchecked items from the cart
             const checkedItems = cart.filter((item) => item.checked);
 
-            // If there are checked items, proceed to checkout
             if (checkedItems.length > 0) {
                 navigation.navigate("Checkout", {
                     cartItems: checkedItems,
                     subtotal: subtotalPrice(checkedItems),
                 });
             } else {
-                // If no items are checked, display a message or handle the case accordingly
                 console.log("No items are checked. Cannot proceed to checkout.");
             }
         } else {
-            // If user is not logged in, navigate to the login screen
             navigation.navigate("Login");
         }
     };
 
-    const { cart, allItemsChecked, selectHandler, selectHandlerAll, deleteHandler,
-        quantityHandler, subtotalPrice, loading, } = useCart();
     return (
         <SafeAreaView
             style={{
@@ -42,7 +39,7 @@ const CartPage = ({ navigation }) => {
             <View
                 style={{
                     flexDirection: "row",
-                    backgroundColor: "#fff",
+                    backgroundColor: colors.danger,
                     marginBottom: 10,
                 }}
             >
@@ -50,10 +47,10 @@ const CartPage = ({ navigation }) => {
                     style={[styles.centerElement, { width: 50, height: 50 }]}
                     onPress={() => navigation.goBack()}
                 >
-                    <MaterialIcons name="arrow-back" size={25} color="#000" />
+                    <MaterialIcons name="arrow-back" size={25} color={colors.white} />
                 </TouchableOpacity>
                 <View style={[styles.centerElement, { height: 50 }]}>
-                    <Text style={{ fontSize: 18, color: "#000" }}>Cart</Text>
+                    <Text style={{ fontSize: 18, color: colors.white }}>Cart</Text>
                 </View>
             </View>
 
@@ -63,127 +60,135 @@ const CartPage = ({ navigation }) => {
                 </View>
             ) : (
                 <ScrollView>
-                    {cart &&
-                        cart.map((item, i) => (
-                            <View
-                                key={i}
-                                style={{
-                                    flexDirection: "row",
-                                    backgroundColor: "#fff",
-                                    marginBottom: 2,
-                                    height: 120,
-                                }}
-                            >
-                                <View style={[styles.centerElement, { width: 60 }]}>
-                                    <TouchableOpacity
-                                        style={[styles.centerElement, { width: 32, height: 32 }]}
-                                        onPress={() => selectHandler(i, item.checked)}
-                                    >
-                                        <Ionicons
-                                            name={
-                                                item.checked == 1
-                                                    ? "checkmark-circle"
-                                                    : "checkmark-circle-outline"
-                                            }
-                                            size={25}
-                                            color={item.checked == 1 ? "#0faf9a" : "#aaaaaa"}
-                                        />
-                                    </TouchableOpacity>
-                                </View>
+                    {cart && cart.length > 0 ? (
+                        cart.map((item, i) => {
+
+                            return (
                                 <View
+                                    key={i}
                                     style={{
                                         flexDirection: "row",
-                                        flexGrow: 1,
-                                        flexShrink: 1,
-                                        alignSelf: "center",
+                                        backgroundColor: "#fff",
+                                        marginBottom: 2,
+                                        height: 120,
                                     }}
                                 >
-                                    <TouchableOpacity
-                                        onPress={() => {
-                                            navigation.navigate("ProductDetails", {
-                                                productDetails: item,
-                                            });
-                                        }}
-                                        style={{ paddingRight: 10 }}
-                                    >
-                                        <Image
-                                            source={{ uri: item.product.images[0] }}
-                                            style={[
-                                                styles.centerElement,
-                                                { height: 60, width: 60, backgroundColor: "#eeeeee" },
-                                            ]}
-                                        />
-                                    </TouchableOpacity>
+                                    <View style={[styles.centerElement, { width: 60 }]}>
+                                        <TouchableOpacity
+                                            style={[styles.centerElement, { width: 32, height: 32 }]}
+                                            onPress={() => selectHandler(i, item.checked)}
+                                        >
+                                            <Ionicons
+                                                name={
+                                                    item.checked
+                                                        ? "checkmark-circle"
+                                                        : "checkmark-circle-outline"
+                                                }
+                                                size={25}
+                                                color={item.checked ? "#0faf9a" : "#aaaaaa"}
+                                            />
+                                        </TouchableOpacity>
+                                    </View>
                                     <View
                                         style={{
+                                            flexDirection: "row",
                                             flexGrow: 1,
                                             flexShrink: 1,
                                             alignSelf: "center",
                                         }}
                                     >
-                                        <Text numberOfLines={1} style={{ fontSize: 15 }}>
-                                            {item.product.name}
-                                        </Text>
-                                        {item && item.selectedVariations && (
-                                            <Text style={{ color: "#333333", marginBottom: 10 }}>
-                                                Variation:{" "}
-                                                {Object.entries(item.selectedVariations)
-                                                    .map(([variation, value]) => `${variation}: ${value}`)
-                                                    .join(", ")}
-                                            </Text>
-                                        )}
-                                        <Text
-                                            numberOfLines={1}
-                                            style={{ color: "#333333", marginBottom: 10 }}
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                navigation.navigate("ProductDetails", {
+                                                    productDetails: item,
+                                                });
+                                            }}
+                                            style={{ paddingRight: 10 }}
                                         >
-                                            $
-                                            {item.discountPrice
-                                                ? item.quantity * item.discountPrice
-                                                : item.quantity * item.amount}
-                                        </Text>
-                                        <View style={{ flexDirection: "row" }}>
-                                            <TouchableOpacity
-                                                onPress={() => quantityHandler("less", i)}
-                                                style={{ borderWidth: 1, borderColor: "#cccccc" }}
-                                            >
-                                                <MaterialIcons
-                                                    name="remove"
-                                                    size={22}
-                                                    color="#cccccc"
-                                                />
-                                            </TouchableOpacity>
-                                            <Text
-                                                style={{
-                                                    borderTopWidth: 1,
-                                                    borderBottomWidth: 1,
-                                                    borderColor: "#cccccc",
-                                                    paddingHorizontal: 7,
-                                                    paddingTop: 3,
-                                                    color: "#bbbbbb",
-                                                    fontSize: 13,
-                                                }}
-                                            >
-                                                {item.quantity}
+                                            <Image
+                                                source={{ uri: item.product?.images?.[0] || 'default_image_url' }}
+                                                style={[
+                                                    styles.centerElement,
+                                                    { height: 60, width: 60, backgroundColor: "#eeeeee" },
+                                                ]}
+                                            />
+                                        </TouchableOpacity>
+                                        <View
+                                            style={{
+                                                flexGrow: 1,
+                                                flexShrink: 1,
+                                                alignSelf: "center",
+                                            }}
+                                        >
+                                            <Text numberOfLines={1} style={{ fontSize: 15 }}>
+                                                {item.product?.name || 'Product Name'}
                                             </Text>
-                                            <TouchableOpacity
-                                                onPress={() => quantityHandler("more", i)}
-                                                style={{ borderWidth: 1, borderColor: "#cccccc" }}
+                                            {item.selectedVariations && (
+                                                <Text style={{ color: "#333333", marginBottom: 10 }}>
+                                                    Variation:{" "}
+                                                    {Object.entries(item.selectedVariations)
+                                                        .map(([variation, value]) => `${variation}: ${value}`)
+                                                        .join(", ")}
+                                                </Text>
+                                            )}
+                                            <Text
+                                                numberOfLines={1}
+                                                style={{ color: "#333333", marginBottom: 10 }}
                                             >
-                                                <MaterialIcons name="add" size={22} color="#cccccc" />
-                                            </TouchableOpacity>
+                                                $
+                                                {item.discountPrice
+                                                    ? item.quantity * item.discountPrice
+                                                    : item.quantity * item.amount}
+                                            </Text>
+                                            <View style={{ flexDirection: "row" }}>
+                                                <TouchableOpacity
+                                                    onPress={() => quantityHandler("less", i)}
+                                                    style={{ borderWidth: 1, borderColor: "#cccccc" }}
+                                                >
+                                                    <MaterialIcons
+                                                        name="remove"
+                                                        size={22}
+                                                        color="#cccccc"
+                                                    />
+                                                </TouchableOpacity>
+                                                <Text
+                                                    style={{
+                                                        borderTopWidth: 1,
+                                                        borderBottomWidth: 1,
+                                                        borderColor: "#cccccc",
+                                                        paddingHorizontal: 7,
+                                                        paddingTop: 3,
+                                                        color: "#bbbbbb",
+                                                        fontSize: 13,
+                                                    }}
+                                                >
+                                                    {item.quantity}
+                                                </Text>
+                                                <TouchableOpacity
+                                                    onPress={() => quantityHandler("more", i)}
+                                                    style={{ borderWidth: 1, borderColor: "#cccccc" }}
+                                                >
+                                                    <MaterialIcons name="add" size={22} color="#cccccc" />
+                                                </TouchableOpacity>
+                                            </View>
                                         </View>
                                     </View>
+                                    <View style={[styles.centerElement, { width: 60 }]}>
+                                        <TouchableOpacity
+                                            style={[styles.centerElement, { width: 32, height: 32 }]}
+                                            onPress={() => deleteHandler(i)}
+                                        >
+                                            <Ionicons name="trash" size={25} color="#ee4d2d" />
+                                        </TouchableOpacity>
+                                    </View>
                                 </View>
-                                <View style={[styles.centerElement, { width: 60 }]}>
-                                    <TouchableOpacity
-                                        style={[styles.centerElement, { width: 32, height: 32 }]}
-                                        onPress={() => deleteHandler(i)}
-                                    >
-                                        <Ionicons name="trash" size={25} color="#ee4d2d" />
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        ))}
+                            );
+                        })
+                    ) : (
+                        <View style={[styles.centerElement, { marginTop: 20 }]}>
+                            <Text>Your cart is empty.</Text>
+                        </View>
+                    )}
                 </ScrollView>
             )}
 
@@ -239,12 +244,12 @@ const CartPage = ({ navigation }) => {
                             >
                                 <Ionicons
                                     name={
-                                        allItemsChecked == true
+                                        allItemsChecked
                                             ? "checkmark-circle"
                                             : "checkmark-circle-outline"
                                     }
                                     size={25}
-                                    color={allItemsChecked == true ? "#0faf9a" : "#aaaaaa"}
+                                    color={allItemsChecked ? "#0faf9a" : "#aaaaaa"}
                                 />
                             </TouchableOpacity>
                         </View>
@@ -301,6 +306,7 @@ const CartPage = ({ navigation }) => {
         </SafeAreaView>
     );
 };
+
 const styles = StyleSheet.create({
     centerElement: {
         justifyContent: "center",

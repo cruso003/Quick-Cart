@@ -77,7 +77,7 @@ function Account() {
 
   const handleMessageOpen = () => {
     if (user) {
-      navigation.navigate("Messages");
+      //navigation.navigate("Messages");
     } else {
       navigation.navigate("Login");
     }
@@ -157,7 +157,7 @@ function Account() {
         >
           {/*Items pending Payment */}
           <TouchablePlatformSpecific
-            //onPress={() => (cartLength > 0 ? navigation.navigate("Cart") : {})}
+            onPress={() => (cartLength > 0 ? navigation.navigate("Cart") : {})}
             background={TouchableNativeFeedback.Ripple("#888", true)}
             useForeground={true}
           >
@@ -167,7 +167,7 @@ function Account() {
                 name="payment"
                 size={35}
                 color="#7f7f7f"
-                badgeCount={1}
+                badgeCount={cartLength}
               />
               <Text style={{ fontSize: 12, color: "#7f7f7f", marginTop: 8 }}>To Pay</Text>
             </View>

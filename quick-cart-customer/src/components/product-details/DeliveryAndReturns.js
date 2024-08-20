@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity, Modal, FlatList, ActivityIndicator } from 'react-native';
-import { RadioButton } from 'react-native-paper';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import LocationModal from '../home/LocationModal';
 import { Picker } from '@react-native-picker/picker';
+import CustomRadioButton from '../CustomRadioButton';
 
 const DeliveryAndReturns = ({
   colors,
@@ -44,12 +44,12 @@ const DeliveryAndReturns = ({
 
       {/** Pickup Station Option */}
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <RadioButton
+        <CustomRadioButton
           value="Pickup Station"
-          status={shipmentOption === "Pickup Station" ? "checked" : "unchecked"}
+          selectedValue={shipmentOption}
           onPress={() => {
             setShipmentOption("Pickup Station");
-            setIsModalVisible(true); // Open the modal when "Pickup Station" is selected
+            setIsModalVisible(true);
           }}
         />
         <Entypo name="shop" size={24} color="black" />
@@ -119,17 +119,17 @@ const DeliveryAndReturns = ({
 
       {/** Door Delivery Option */}
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <RadioButton
+        <CustomRadioButton
           value="Door Delivery"
-          status={shipmentOption === "Door Delivery" ? "checked" : "unchecked"}
+          selectedValue={shipmentOption}
           onPress={() => setShipmentOption("Door Delivery")}
         />
         <MaterialCommunityIcons name="truck-delivery" size={25} color="#000" />
         <View style={{ marginBottom: 10, flexDirection: "column", alignItems: "flex-start", marginLeft: 10 }}>
           <Text style={{ marginLeft: 2, fontWeight: "bold" }}>Door Delivery</Text>
-          {shipmentOption === "Door Delivery" && (
+          {shipmentOption === "Door Delivery" && selectedAddress && (
             <Text style={{ fontSize: 11, color: "red" }}>
-              Deliver to {selectedAddress?.name} - {selectedAddress?.street}
+              Deliver to {selectedAddress.name} - {selectedAddress.street}
             </Text>
           )}
           <Text style={{ fontSize: 11 }}>Delivery Fees ${deliveryFee}</Text>

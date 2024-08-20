@@ -372,7 +372,7 @@ const handleAddToWishlist = () => {
         marginTop: Platform.OS === "ios" ? 40 : StatusBar.currentHeight,
       }}
     >
-      <Header title={product.name} onBack={() => navigation.goBack()} cartLength={cartLength}/>
+      <Header title={product.name} onBack={() => navigation.goBack()} cartLength={cartLength} onCart={() => navigation.navigate("Cart")}/>
       <ScrollView>
         <View
           style={{

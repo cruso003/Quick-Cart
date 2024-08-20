@@ -1,5 +1,14 @@
 import { useState, useEffect } from "react";
-import { ActivityIndicator, Alert, Image, Text, Modal, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  Text,
+  Modal,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useStripe } from "@stripe/stripe-react-native";
 import paymentApi from "../../api/payment/payment";
 import ordersApi from "../../api/order/order";
@@ -8,6 +17,7 @@ import cartApi from "../../api/cart/cart";
 import { useAuth } from "../../context/auth";
 import { useCart } from "../../context/cart";
 import { styles } from "../screens/checkout/styles";
+import uuid from "react-native-uuid";
 
 export const useCheckout = (navigation, route) => {
   const { user } = useAuth();
@@ -20,8 +30,12 @@ export const useCheckout = (navigation, route) => {
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [modalSubmitHandler, setModalSubmitHandler] = useState(null);
 
   const userId = user.id;
+  const paymentId = uuid.v4();
+  
 
   useEffect(() => {
     fetchWalletBalance();
@@ -76,7 +90,7 @@ export const useCheckout = (navigation, route) => {
     const response = await paymentApi.createPaymentIntent(totalAmount);
     if (response.error) {
       Alert.alert("Something went wrong");
-      return;
+      return false; // Indicate failure
     }
 
     const initResponse = await initPaymentSheet({
@@ -92,63 +106,122 @@ export const useCheckout = (navigation, route) => {
 
     if (initResponse.error) {
       Alert.alert("Something went wrong");
-      return;
+      return false; // Indicate failure
     }
 
     const paymentResult = await presentPaymentSheet();
     if (paymentResult.error) {
       Alert.alert("Payment failed. Please try again.");
-      return;
+      return false; // Indicate failure
     }
 
-    setCurrentStep(currentStep + 1);
+    // Payment succeeded
+    return true;
   };
 
-  const handleModalSubmit = async (onSuccess) => {
-    const totalAmount = calculateGrandTotal();
-    const response = await paymentApi.requestToPay(totalAmount, phoneNumber);
-    console.log(response);
+  const mobilePayment = async () => {
+    return new Promise((resolve) => {
+      const handleClose = (success) => {
+        setIsModalVisible(false);
+        resolve(success);
+      };
   
-    if (response.error) {
-      alert("Payment failed. Please try again.");
-      setIsModalVisible(false);
-    } else {
-      alert("Payment successful. Thank you for your order!");
-      setIsModalVisible(false);
-      // Call clearCartAfterOrder here after payment success
-      await clearCartAfterOrder();
-      onSuccess();
-    }
+      const handleModalSubmit = async () => {    
+  
+        const totalAmount = calculateGrandTotal();
+        try {
+          setLoading(true);
+          const response = await paymentApi.requestToPay(totalAmount, phoneNumber);
+  
+          if (response.error) {
+            Alert.alert("Payment failed. Please try again.");
+            handleClose(false);
+          } else {
+            Alert.alert("Payment successful. Thank you for your order!");
+            handleClose(true);
+          }
+        } catch (error) {
+          Alert.alert("An error occurred. Please try again.");
+          handleClose(false);
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      setModalSubmitHandler(() => handleModalSubmit);
+      setIsModalVisible(true);
+    });
   };
-  
   
 
-  const handleCloseModal = () => {
-    setIsModalVisible(false);
-  };
+  const RenderModal = () => (
+    <Modal
+      visible={isModalVisible}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={() => setIsModalVisible(false)}
+    >
+      <View style={styles.modalContainer}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Pay with Mobile Money</Text>
+          <TextInput
+            placeholder="Enter phone number"
+            placeholderTextColor="grey"
+            keyboardType="phone-pad"
+            maxLength={10}
+            value={phoneNumber}
+            onChangeText={(text) => setPhoneNumber(text)}
+            style={styles.modalInput}
+          />
+          <Image
+            source={require("../../assets/momo.jpg")}
+            style={styles.modalImage}
+          />
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              onPress={async () => {
+                if (!phoneNumber.trim()) {
+                  Alert.alert("Please enter your phone number.");
+                  return;
+                }
+                await modalSubmitHandler();
+              }}
+              style={styles.submitButton}
+            >
+              <Text style={styles.buttonText}>Pay</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setIsModalVisible(false)}
+              style={[styles.submitButton, styles.cancelButton]}
+            >
+              <Text style={styles.buttonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+  
 
   const makePayment = async () => {
     try {
       setLoading(true);
-      let paymentSuccess = false;
-  
+      let isPaymentSuccessful = false;
+
       if (selectedPaymentMethod === "bankCard") {
-        paymentSuccess = await bankPayment();
+        isPaymentSuccessful = await bankPayment();
       } else if (selectedPaymentMethod === "mobileMoney") {
-        // Set the modal visible and wait for the result
-        setIsModalVisible(true);
-        await new Promise((resolve) => {
-          handleModalSubmit(resolve);
-        });
-        paymentSuccess = true;
+        isPaymentSuccessful = await mobilePayment();
       } else if (selectedPaymentMethod === "wallet") {
         const totalAmount = calculateGrandTotal();
         if (walletBalance >= totalAmount) {
-          const updatedBalance = walletBalance - totalAmount;
-          const response = await walletApi.updateWalletBalance(user.id, -totalAmount);
+          const response = await walletApi.updateWalletBalance(
+            userId,
+            -totalAmount
+          );
           if (response.ok) {
-            setWalletBalance(updatedBalance);
-            paymentSuccess = true;
+            setWalletBalance(walletBalance - totalAmount);
+            isPaymentSuccessful = true;
           } else {
             throw new Error("Failed to update wallet balance");
           }
@@ -157,40 +230,76 @@ export const useCheckout = (navigation, route) => {
           return;
         }
       } else if (selectedPaymentMethod === "cashOnDelivery") {
-        paymentSuccess = true;
+        isPaymentSuccessful = true;
         cashOnDelivery();
       }
-  
-      // Call clearCartAfterOrder only if payment was successful
-      if (paymentSuccess) {
-        await clearCartAfterOrder();
-        setCurrentStep(currentStep + 1);
+
+      if (isPaymentSuccessful) {
+        const orderDetails = {
+          products: stepOne.cartItems.map((item) => ({
+            product: item.product,
+            productId: item.productId,
+            quantity: item.quantity,
+            deliveryCharge: item.deliveryFee,
+            selectedVariations: item.selectedVariations,
+            deliveryMethod: item.shipmentOption,
+            paymentMethod: selectedPaymentMethod,
+            store: item.store,
+            totalAmount:
+              parseFloat(subtotalPrice().toFixed(2)) +
+              parseFloat(item.deliveryFee.toFixed(2)),
+            type: "physical",
+          })),
+          userId: userId,
+          status: "Pending",
+          paymentId: paymentId,
+          deliveryCharge: stepOne.cartItems.reduce(
+            (total, item) => total + item.deliveryFee,
+            0
+          ),
+          totalAmount: stepOne.cartItems.reduce(
+            (total, item) =>
+              total + item.quantity * item.product.price + item.deliveryFee,
+            0
+          ),
+          deliveryMethod: stepOne.cartItems.map((item) => item.shipmentOption),
+          paymentMethod: selectedPaymentMethod,
+          type: "physical",
+        };
+
+        const orderResponse = await createOrder(orderDetails);
+
+        if (orderResponse && orderResponse.status === 201) {
+          await clearCartAfterOrder();
+          setPaymentSuccess(true);
+        } else {
+          setPaymentSuccess(false);
+        }
+        setCurrentStep(4);
       } else {
-        alert("Payment failed. Please try again.");
+        setPaymentSuccess(false);
+        setCurrentStep(4);
       }
     } catch (error) {
       console.error("Error processing payment:", error);
-      alert("An error occurred while processing the payment. Please try again later.");
+      setPaymentSuccess(false);
+      setCurrentStep(4);
     } finally {
       setLoading(false);
     }
   };
-  
-  
-  
 
   const createOrder = async (orderDetails) => {
     try {
       const response = await ordersApi.placeOrder(orderDetails);
-      
       if (response.status === 201) {
-        alert("Order created successfully");
+        return response;
       } else {
-        alert("Failed to create order");
+        return response;
       }
     } catch (error) {
       console.error("Error creating order", error);
-      alert("An error occurred while trying to create your order");
+      return { status: 500 };
     }
   };
 
@@ -278,54 +387,6 @@ export const useCheckout = (navigation, route) => {
     },
   ];
 
-  // Render modal component within a React component
-  const RenderModal = () => (
-    <Modal
-      visible={isModalVisible}
-      animationType="slide"
-      transparent={true}
-      onRequestClose={handleCloseModal}
-    >
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Pay with Mobile Money</Text>
-          <TextInput
-            placeholder="Enter phone number"
-            placeholderTextColor="grey"
-            keyboardType="phone-pad"
-            maxLength={10}
-            value={phoneNumber}
-            onChangeText={(text) => setPhoneNumber(text)}
-            style={styles.modalInput}
-          />
-          <Image
-            source={require("../../assets/momo.jpg")}
-            style={styles.modalImage}
-          />
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              onPress={handleModalSubmit}
-              style={styles.submitButton}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator size="small" color="#000" />
-              ) : (
-                <Text style={styles.buttonText}>Pay</Text>
-              )}
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleCloseModal}
-              style={[styles.submitButton, styles.cancelButton]}
-            >
-              <Text style={styles.buttonText}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    </Modal>
-  );
-
   return {
     currentStep,
     setCurrentStep,
@@ -347,6 +408,7 @@ export const useCheckout = (navigation, route) => {
     subtotalPrice,
     calculateGrandTotal,
     userId,
-    RenderModal
+    RenderModal,
+    paymentSuccess,
   };
 };

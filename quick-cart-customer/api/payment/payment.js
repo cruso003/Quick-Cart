@@ -6,6 +6,7 @@ const requestToPayEndpoint = "/payment/request-to-pay";
 const requestToPay = async (total, phone) => {
   try {
     const response = await client.post(requestToPayEndpoint, { total, phone });
+    
     return response.data;
   } catch (error) {
     console.error("Error requesting to pay:", error);

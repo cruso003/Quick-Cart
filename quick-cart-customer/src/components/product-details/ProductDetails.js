@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { RadioButton } from 'react-native-paper';
+import CustomRadioButton from '../CustomRadioButton';
 
 const ProductDetails = ({
   product,
@@ -18,7 +18,6 @@ const ProductDetails = ({
         <Text style={styles.label}>Brand:</Text>
         <Text style={styles.value}>{product.brand ? product.brand : "N/A"}</Text>
       </View>
-      {/* Render variations only if variations exist */}
       {product.variations && product.variations.length > 0 && (
         <View style={styles.variationsContainer}>
           {product.variations.map((variation, index) => (
@@ -28,16 +27,12 @@ const ProductDetails = ({
                 <View style={styles.optionsRow}>
                   {variation.options.map((option, optionIndex) => (
                     <View key={optionIndex} style={styles.optionContainer}>
-                      <RadioButton
+                      <CustomRadioButton
                         value={option}
-                        status={
-                          selectedVariations[variation.name] === option
-                            ? "checked"
-                            : "unchecked"
-                        }
-                        onPress={() => handleVariationSelect(variation.name, option)}
+                        selectedValue={selectedVariations[variation.name]}
+                        onPress={(value) => handleVariationSelect(variation.name, value)}
+                        label={option}
                       />
-                      <Text style={styles.optionText}>{option}</Text>
                     </View>
                   ))}
                 </View>
@@ -97,9 +92,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginRight: 15,
-  },
-  optionText: {
-    marginLeft: 5,
   },
   description: {
     paddingVertical: 10,

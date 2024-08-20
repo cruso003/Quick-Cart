@@ -43,11 +43,7 @@ const Banners = ({ navigation }) => {
       {banners.map((banner) => (
         <TouchableOpacity
           key={banner.id}
-          onPress={() => {
-            navigation.navigate("BannerProducts", {
-              bannerId: banner.id,
-            });
-          }}
+          onPress={()=> {}}
           style={{ borderWidth: 1 }}
         >
           <Image
